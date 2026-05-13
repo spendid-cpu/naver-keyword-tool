@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미래아이엔씨 네이버 키워드광고 대량관리 v.1.0</title>
+<style>
+  :root {
+    --bg: #f4f6f9; --card: #ffffff; --border: #dde1e7; --text: #1a1d23; --text-sub: #6b7280;
+    --primary: #03c75a; --primary-hover: #02a84a; --primary-light: #e8faf1;
+    --danger: #ff4d4f; --warning: #faad14; --info: #1890ff;
+    --input-bg: #ffffff; --input-border: #d1d5db;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08); --shadow-hover: 0 4px 16px rgba(0,0,0,0.14);
+    --radius: 10px; --radius-sm: 6px;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117; --card: #1c1f26; --border: #2e3340; --text: #e8eaf0; --text-sub: #9aa0b0;
+    --primary-light: #0d2e1a; --danger: #ff6b6b; --warning: #ffc53d; --info: #40a9ff;
+    --input-bg: #252830; --input-border: #3a3f4e;
+    --shadow: 0 2px 8px rgba(0,0,0,0.3); --shadow-hover: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; transition: background 0.3s, color 0.3s; }
+  .header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+  .header-logo { font-size: 18px; font-weight: 700; color: var(--primary); }
+  .header-logo span { color: var(--text); font-weight: 400; font-size: 13px; margin-left: 8px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-icon { background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 12px; cursor: pointer; color: var(--text); font-size: 13px; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
+  .btn-icon:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+  .main-tabs { display: flex; background: var(--card); border-bottom: 2px solid var(--border); padding: 0 24px; overflow-x: auto; }
+  .main-tab { padding: 14px 20px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text-sub); border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .main-tab:hover { color: var(--primary); }
+  .main-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+  .tab-badge { background: var(--primary); color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 700; }
+  .content { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .card-title .badge { background: var(--primary-light); color: var(--primary); font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .form-group { margin-bottom: 12px; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .form-label .req { color: var(--danger); margin-left: 2px; }
+  input[type="text"], input[type="number"], input[type="url"], select, textarea {
+    width: 100%; padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm);
+    background: var(--input-bg); color: var(--text); font-size: 13px; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(3,199,90,0.12); }
+  input:disabled, select:disabled, textarea:disabled { opacity: 0.5; cursor: not-allowed; background: var(--bg); }
+  textarea { resize: vertical; min-height: 80px; }
+  .btn { padding: 9px 18px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(3,199,90,0.3); }
+  .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover:not(:disabled) { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover:not(:disabled) { opacity: 0.85; }
+  .btn-warning { background: var(--warning); color: #fff; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-lg { padding: 12px 28px; font-size: 15px; }
+  .btn-full { width: 100%; justify-content: center; }
+  .region-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 800px) { .region-steps { grid-template-columns: repeat(2, 1fr); } }
+  .region-step { display: flex; flex-direction: column; }
+  .region-step-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .region-step-label { font-size: 12px; font-weight: 700; color: var(--text-sub); display: flex; align-items: center; gap: 6px; }
+  .step-num { width: 18px; height: 18px; background: var(--primary); color: #fff; border-radius: 50%; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+  .region-search { margin-bottom: 4px; padding: 6px 10px; font-size: 12px; }
+  .region-list { border: 1px solid var(--border); border-radius: var(--radius-sm); height: 180px; overflow-y: auto; background: var(--input-bg); }
+  .region-list.disabled { opacity: 0.4; pointer-events: none; background: var(--bg); }
+  .region-item { padding: 6px 10px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); transition: background 0.15s; display: flex; align-items: center; gap: 6px; }
+  .region-item:last-child { border-bottom: none; }
+  .region-item:hover { background: var(--primary-light); }
+  .region-item.selected { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .region-item input[type="checkbox"] { accent-color: var(--primary); flex-shrink: 0; }
+  .region-count { font-size: 11px; color: var(--text-sub); background: var(--bg); padding: 2px 6px; border-radius: 8px; }
+  .region-notice { font-size: 11px; color: var(--warning); padding: 8px; text-align: center; background: rgba(250,173,20,0.08); border-radius: var(--radius-sm); margin-top: 4px; }
+  .region-actions { display: flex; gap: 4px; margin-bottom: 4px; }
+  .region-actions .btn { font-size: 11px; padding: 3px 8px; }
+  .mixer-inputs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  @media (max-width: 1000px) { .mixer-inputs { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .mixer-inputs { grid-template-columns: 1fr 1fr; } }
+  .mixer-box { display: flex; flex-direction: column; }
+  .mixer-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .mixer-box-label { font-size: 12px; font-weight: 600; color: var(--text-sub); }
+  .mixer-textarea { min-height: 120px; font-size: 12px; resize: vertical; }
+  .mixer-count { font-size: 11px; color: var(--text-sub); text-align: right; margin-top: 2px; }
+  .mix-options { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; padding: 12px; background: var(--bg); border-radius: var(--radius-sm); }
+  .mix-option-group { display: flex; align-items: center; gap: 6px; }
+  .mix-option-group label { font-size: 12px; color: var(--text-sub); font-weight: 500; }
+  .mix-option-group input[type="text"] { width: 60px; padding: 4px 8px; font-size: 12px; }
+  .combo-builder { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px; }
+  .combo-builder-title { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+  .combo-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; min-height: 32px; }
+  .combo-row { display: flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 10px; flex-wrap: wrap; }
+  .combo-row .combo-boxes { display: flex; align-items: center; gap: 4px; flex: 1; flex-wrap: wrap; }
+  .combo-box-btn { padding: 3px 10px; border-radius: 14px; font-size: 12px; font-weight: 700; border: 2px solid var(--border); background: var(--card); color: var(--text-sub); cursor: pointer; transition: all 0.15s; user-select: none; }
+  .combo-box-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+  .combo-box-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .combo-plus { font-size: 12px; color: var(--text-sub); padding: 0 2px; }
+  .combo-del { background: none; border: none; color: var(--text-sub); cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px; }
+  .combo-del:hover { color: var(--danger); }
+  .result-area { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; min-height: 100px; max-height: 320px; overflow-y: auto; font-size: 13px; white-space: pre-wrap; word-break: break-all; color: var(--text); }
+  .result-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+  .result-stats { font-size: 12px; color: var(--text-sub); margin-left: auto; }
+  .naver-section { display: grid; grid-template-columns: 340px 1fr; gap: 16px; }
+  @media (max-width: 900px) { .naver-section { grid-template-columns: 1fr; } }
+  .sub-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 16px; overflow-x: auto; }
+  .sub-tab { padding: 10px 18px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-sub); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; white-space: nowrap; }
+  .sub-tab:hover { color: var(--primary); }
+  .sub-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+  .sub-panel { display: none; }
+  .sub-panel.active { display: block; }
+  .ad-settings { display: flex; flex-direction: column; gap: 10px; }
+  .char-counter { font-size: 11px; text-align: right; margin-top: 2px; }
+  .char-ok { color: var(--primary); }
+  .char-warn { color: var(--warning); }
+  .char-over { color: var(--danger); }
+  .ad-table-wrap { overflow-x: auto; }
+  .ad-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .ad-table th { background: var(--bg); padding: 8px 10px; text-align: left; font-weight: 600; color: var(--text-sub); border-bottom: 2px solid var(--border); white-space: nowrap; }
+  .ad-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  .ad-table tr:hover td { background: var(--primary-light); }
+  .ad-table .btn-del { padding: 3px 8px; font-size: 11px; }
+  .no-data { text-align: center; color: var(--text-sub); padding: 32px; font-size: 13px; }
+  .bulk-pool-container { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); padding: 10px; min-height: 60px; max-height: 140px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; margin-bottom: 10px; }
+  .pool-container { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); padding: 10px; min-height: 80px; max-height: 180px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; }
+  .pool-chip, .bulk-pool-chip { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 3px 10px; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+  .pool-chip .del, .bulk-pool-chip .del { cursor: pointer; color: var(--text-sub); font-size: 11px; }
+  .pool-chip .del:hover, .bulk-pool-chip .del:hover { color: var(--danger); }
+  .csv-file-list { display: flex; flex-direction: column; gap: 8px; }
+  .csv-file-item { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); }
+  .csv-file-item:hover { border-color: var(--primary); }
+  .csv-file-info { flex:1; }
+  .csv-file-name { font-size:13px; font-weight:600; color:var(--text); }
+  .csv-file-meta { font-size:11px; color:var(--text-sub); margin-top:3px; }
+  .csv-file-count { font-size:12px; font-weight:700; }
+  .csv-file-count.ok { color: var(--primary); }
+  .csv-file-count.warn { color: var(--warning); }
+  .group-list { display: flex; flex-direction: column; gap: 6px; }
+  .group-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; }
+  .group-item:hover { border-color: var(--primary); background: var(--primary-light); }
+  .group-item.active { border-color: var(--primary); background: var(--primary-light); }
+  .group-name { font-size: 13px; font-weight: 600; flex: 1; }
+  .group-id { font-size: 11px; color: var(--text-sub); }
+  .library-toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; padding: 12px; background: var(--bg); border-radius: var(--radius-sm); }
+  .library-toolbar input { flex: 1; min-width: 150px; max-width: 220px; }
+  .category-block { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+  .category-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--bg); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .category-title { font-size: 14px; font-weight: 700; flex: 1; display: flex; align-items: center; gap: 6px; }
+  .category-title .star { cursor: pointer; font-size: 16px; }
+  .category-title .star.active { color: var(--warning); }
+  .category-title .star:not(.active) { color: var(--border); }
+  .category-header-actions { display: flex; gap: 6px; align-items: center; }
+  .category-body { padding: 12px; }
+  .category-add-row { display: flex; gap: 6px; margin-top: 10px; }
+  .category-add-row input { flex: 1; font-size: 12px; padding: 5px 8px; }
+  .intent-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .intent-chip { padding: 5px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; font-size: 12px; cursor: pointer; transition: all 0.15s; user-select: none; display: flex; align-items: center; gap: 5px; }
+  .intent-chip:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+  .intent-chip .chip-del { color: var(--text-sub); font-size: 10px; cursor: pointer; padding: 0 2px; line-height: 1; }
+  .intent-chip .chip-del:hover { color: var(--danger); }
+  .fav-section { border: 2px solid var(--warning); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
+  .fav-section .category-header { background: rgba(250,173,20,0.08); border-bottom-color: var(--warning); }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-sub); }
+  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+  .toast { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 18px; font-size: 13px; box-shadow: var(--shadow-hover); animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 8px; min-width: 240px; }
+  .toast.success { border-left: 4px solid var(--primary); }
+  .toast.error { border-left: 4px solid var(--danger); }
+  .toast.warning { border-left: 4px solid var(--warning); }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+  .info-box { background: rgba(24,144,255,0.08); border: 1px solid rgba(24,144,255,0.25); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--info); margin-bottom: 12px; line-height: 1.7; }
+  .check-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .check-item { display: flex; align-items: center; gap: 5px; font-size: 12px; cursor: pointer; }
+  .check-item input { accent-color: var(--primary); cursor: pointer; }
+  .region-opt-divider { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+  .inline-pool-container { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); padding: 10px; min-height: 60px; max-height: 140px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">미래아이엔씨 네이버 키워드광고 대량관리<span>v1.00</span></div>
+  <div class="header-actions">
+    <button class="btn-icon" id="themeBtn" onclick="toggleTheme()">🌙 다크모드</button>
+    <button class="btn-icon" onclick="clearAll()">🗑 전체초기화</button>
+  </div>
+</div>
+
+<div class="main-tabs">
+  <div class="main-tab active" onclick="switchMainTab('mixer',this)">🔑 키워드 믹서</div>
+  <div class="main-tab" onclick="switchMainTab('naver',this)">📤 네이버 대량등록 <span class="tab-badge" id="naverBadge">0</span></div>
+  <div class="main-tab" onclick="switchMainTab('library',this)">📚 의도 라이브러리</div>
+  <div class="main-tab" onclick="switchMainTab('pool',this)">🗂 키워드 풀 <span class="tab-badge" id="poolBadge">0</span></div>
+</div>
+
+<div class="content">
+
+  <!-- 탭1: 키워드 믹서 -->
+  <div class="tab-panel active" id="tab-mixer">
+    <div class="card">
+      <div class="card-title">📍 지역 키워드 생성 <span class="badge">선택사항</span></div>
+      <div class="region-steps">
+        <div class="region-step">
+          <div class="region-step-header">
+            <div class="region-step-label"><span class="step-num">1</span> 시/도</div>
+            <span class="region-count" id="cnt1">0</span>
+          </div>
+          <input type="text" class="region-search" id="search1" placeholder="검색..." oninput="filterRegion(1)">
+          <div class="region-actions">
+            <button class="btn btn-secondary btn-sm" onclick="selectAllRegion(1)">전체</button>
+            <button class="btn btn-secondary btn-sm" onclick="clearRegion(1)">초기화</button>
+          </div>
+          <div class="region-list" id="list1"></div>
+        </div>
+        <div class="region-step">
+          <div class="region-step-header">
+            <div class="region-step-label"><span class="step-num">2</span> 시/군</div>
+            <span class="region-count" id="cnt2">0</span>
+          </div>
+          <input type="text" class="region-search" id="search2" placeholder="검색..." oninput="filterRegion(2)">
+          <div class="region-actions">
+            <button class="btn btn-secondary btn-sm" onclick="selectAllRegion(2)">전체</button>
+            <button class="btn btn-secondary btn-sm" onclick="clearRegion(2)">초기화</button>
+          </div>
+          <div class="region-list disabled" id="list2"></div>
+        </div>
+        <div class="region-step">
+          <div class="region-step-header">
+            <div class="region-step-label"><span class="step-num">3</span> 구</div>
+            <span class="region-count" id="cnt3">0</span>
+          </div>
+          <input type="text" class="region-search" id="search3" placeholder="검색..." oninput="filterRegion(3)">
+          <div class="region-actions">
+            <button class="btn btn-secondary btn-sm" onclick="selectAllRegion(3)">전체</button>
+            <button class="btn btn-secondary btn-sm" onclick="clearRegion(3)">초기화</button>
+          </div>
+          <div class="region-list disabled" id="list3"></div>
+          <div id="guNotice" style="display:none" class="region-notice">⚠ 구 단위 없음 — 읍/면/동 바로 선택</div>
+        </div>
+        <div class="region-step">
+          <div class="region-step-header">
+            <div class="region-step-label"><span class="step-num">4</span> 읍/면/동</div>
+            <span class="region-count" id="cnt4">0</span>
+          </div>
+          <input type="text" class="region-search" id="search4" placeholder="검색..." oninput="filterRegion(4)">
+          <div class="region-actions">
+            <button class="btn btn-secondary btn-sm" onclick="selectAllRegion(4)">전체</button>
+            <button class="btn btn-secondary btn-sm" onclick="clearRegion(4)">초기화</button>
+          </div>
+          <div class="region-list disabled" id="list4"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-primary" onclick="generateRegionKeywords()">📍 지역 키워드 생성</button>
+        <select id="regionTargetBox" style="width:auto;padding:6px 10px;font-size:13px;"></select>
+        <div class="region-opt-divider"></div>
+        <div class="check-group">
+          <label class="check-item"><input type="checkbox" id="inclSido"> 시/도 포함</label>
+          <label class="check-item"><input type="checkbox" id="inclGun"> 시/군 포함</label>
+          <label class="check-item"><input type="checkbox" id="inclGu" checked> 구 포함</label>
+          <label class="check-item"><input type="checkbox" id="inclDong" checked> 읍면동 포함</label>
+        </div>
+        <div class="region-opt-divider"></div>
+        <div class="check-group">
+          <label class="check-item"><input type="checkbox" id="regionRemoveNum"> 숫자 제거</label>
+          <label class="check-item"><input type="checkbox" id="regionRemoveSuffix"> 동/읍/면 제거</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔀 키워드 믹서</div>
+      <div class="mix-options">
+        <div class="mix-option-group">
+          <label class="check-item"><input type="checkbox" id="removeNum"> 숫자 제거</label>
+        </div>
+        <div class="mix-option-group">
+          <label class="check-item"><input type="checkbox" id="removeDup" checked> 중복 제거</label>
+        </div>
+        <div class="mix-option-group">
+          <label>구분자</label>
+          <input type="text" id="mixSep" value=" " placeholder="공백">
+        </div>
+        <div class="mix-option-group">
+          <label>접두사</label>
+          <input type="text" id="mixPrefix" placeholder="없음">
+        </div>
+        <div class="mix-option-group">
+          <label>접미사</label>
+          <input type="text" id="mixSuffix" placeholder="없음">
+        </div>
+      </div>
+      <div class="mixer-inputs" id="mixerInputs"></div>
+      <div class="combo-builder" id="comboBuilder">
+        <div class="combo-builder-title">
+          <span>🔗 조합 설정 <small style="font-weight:400;color:var(--text-sub);">(박스 번호를 클릭해 순서 지정 → 여러 조합 추가 가능)</small></span>
+          <button class="btn btn-secondary btn-sm" onclick="addComboRow()">＋ 조합 추가</button>
+        </div>
+        <div class="combo-list" id="comboList"></div>
+        <div style="font-size:11px;color:var(--text-sub);margin-top:4px;">💡 각 조합의 박스 번호를 클릭하면 순서에 추가됩니다. 모든 조합의 결과가 합산됩니다.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="btn btn-primary btn-lg" onclick="mixKeywords()">🔀 키워드 믹스</button>
+        <button class="btn btn-secondary" onclick="addMixerBox()">＋ 박스 추가</button>
+        <button class="btn btn-secondary" onclick="removeMixerBox()">－ 박스 제거</button>
+        <button class="btn btn-secondary" onclick="clearMixerBoxes()">🗑 전체 지우기</button>
+      </div>
+      <div class="result-area" id="mixResult"></div>
+      <div class="result-actions">
+        <button class="btn btn-secondary btn-sm" onclick="copyResult('mixResult')">📋 복사</button>
+        <button class="btn btn-secondary btn-sm" onclick="addToPool()">➕ 일반 풀에 추가</button>
+        <button class="btn btn-secondary btn-sm" onclick="addToBulkPool()">➕ 대량 풀에 추가</button>
+        <button class="btn btn-secondary btn-sm" onclick="downloadTxt()">💾 TXT 다운</button>
+        <div class="result-stats" id="mixStats"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭2: 네이버 대량등록 -->
+  <div class="tab-panel" id="tab-naver">
+    <div class="sub-tabs">
+      <div class="sub-tab active" onclick="switchSubTab('keyword',this)">📋 일반 그룹 등록</div>
+      <div class="sub-tab" onclick="switchSubTab('bulk',this)">🚀 대량 등록 <span class="tab-badge" id="bulkBadge">0</span></div>
+      <div class="sub-tab" onclick="switchSubTab('rsa',this)">📱 반응형 소재</div>
+      <div class="sub-tab" onclick="switchSubTab('single',this)">📄 단일형 소재</div>
+    </div>
+
+    <!-- 일반 그룹 등록 -->
+    <div class="sub-panel active" id="sub-keyword">
+      <div class="naver-section">
+        <div>
+          <div class="card">
+            <div class="card-title">🗂 일반 키워드 풀 <span class="badge" id="kwPoolCount">0개</span></div>
+            <div class="inline-pool-container" id="kwPoolContainer">
+              <div class="no-data" style="width:100%;padding:12px;">풀이 비어있습니다</div>
+            </div>
+            <div class="result-actions">
+              <button class="btn btn-secondary btn-sm" onclick="copyPool()">📋 전체 복사</button>
+              <button class="btn btn-secondary btn-sm" onclick="downloadPool()">💾 TXT 다운</button>
+              <button class="btn btn-danger btn-sm" onclick="clearPool()">🗑 초기화</button>
+              <div class="result-stats" id="kwPoolStats"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">⚙ 등록 설정</div>
+            <div class="ad-settings">
+              <div class="form-group">
+                <label class="form-label">광고그룹 관리</label>
+                <div class="group-list" id="kwGroupList"><div class="no-data" style="padding:12px;">등록된 그룹 없음</div></div>
+                <div style="display:flex;gap:6px;margin-top:8px;">
+                  <input type="text" id="kwGroupId" placeholder="광고그룹ID" style="flex:1;">
+                  <input type="text" id="kwGroupName" placeholder="그룹명(메모)" style="flex:1;">
+                  <button class="btn btn-primary btn-sm" onclick="addKwGroup()">추가</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">PC URL <small style="color:var(--text-sub);font-weight:400;">(선택)</small></label>
+                <input type="url" id="kwPcUrl" placeholder="https://">
+              </div>
+              <div class="form-group">
+                <label class="form-label">모바일 URL <small style="color:var(--text-sub);font-weight:400;">(선택)</small></label>
+                <input type="url" id="kwMoUrl" placeholder="https://">
+              </div>
+              <div class="form-group">
+                <label class="form-label">입찰가 <small style="color:var(--text-sub);font-weight:400;">(선택, 숫자만)</small></label>
+                <input type="number" id="kwBid" placeholder="기본 입찰가 적용" min="0">
+              </div>
+              <div class="form-group">
+                <label class="form-label">키워드 소스</label>
+                <div class="check-group" style="margin-bottom:8px;">
+                  <label class="check-item"><input type="radio" name="kwSrc" value="pool" checked> 일반 키워드 풀</label>
+                  <label class="check-item"><input type="radio" name="kwSrc" value="direct"> 직접 입력</label>
+                </div>
+                <textarea id="kwDirect" placeholder="키워드를 줄바꿈으로 입력..." style="display:none;min-height:100px;"></textarea>
+              </div>
+            </div>
+            <div style="margin-top:12px;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 12px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);">
+                <label class="check-item" style="font-size:13px;">
+                  <input type="checkbox" id="kwMergeMode" onchange="toggleKwMergeSelect()">
+                  <span>기존 파일에 추가</span>
+                </label>
+                <select id="kwMergeTarget" style="display:none;flex:1;font-size:12px;padding:4px 8px;">
+                  <option value="">— 파일 선택 —</option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-full" onclick="generateKwCSV()">⬇ CSV 생성</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">📁 생성된 CSV 파일 <span class="badge" id="kwCsvCount">0개</span></div>
+            <div id="kwCsvList" class="csv-file-list">
+              <div class="no-data">CSV 파일 없음<br><small>CSV 생성 버튼을 눌러주세요</small></div>
+            </div>
+            <div class="result-actions" style="margin-top:12px;">
+              <button class="btn btn-danger btn-sm" onclick="clearKwCsvList()">🗑 목록 초기화</button>
+              <div class="result-stats" id="kwCsvStats"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 대량 등록 탭 -->
+    <div class="sub-panel" id="sub-bulk">
+      <div class="naver-section">
+        <div>
+          <div class="card">
+            <div class="card-title">⚙ 대량 등록 설정</div>
+            <div class="ad-settings">
+              <div class="form-group">
+                <label class="form-label">광고그룹 관리 <small style="color:var(--text-sub);font-weight:400;">(1000개 단위 자동 분할)</small></label>
+                <div class="group-list" id="bulkGroupList"><div class="no-data" style="padding:12px;">등록된 그룹 없음</div></div>
+                <div style="display:flex;gap:6px;margin-top:8px;">
+                  <input type="text" id="bulkGroupId" placeholder="광고그룹ID" style="flex:1;">
+                  <input type="text" id="bulkGroupName" placeholder="그룹명(메모)" style="flex:1;">
+                  <button class="btn btn-primary btn-sm" onclick="addBulkGroup()">추가</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">PC URL <small style="color:var(--text-sub);font-weight:400;">(선택)</small></label>
+                <input type="url" id="bulkPcUrl" placeholder="https://">
+              </div>
+              <div class="form-group">
+                <label class="form-label">모바일 URL <small style="color:var(--text-sub);font-weight:400;">(선택)</small></label>
+                <input type="url" id="bulkMoUrl" placeholder="https://">
+              </div>
+              <div class="form-group">
+                <label class="form-label">입찰가 <small style="color:var(--text-sub);font-weight:400;">(선택, 숫자만)</small></label>
+                <input type="number" id="bulkBid" placeholder="기본 입찰가 적용" min="0">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="generateBulkCSV()" style="margin-top:8px;">⬇ 대량 CSV 생성</button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">🚀 대량 키워드 풀 <span class="badge" id="bulkPoolCount">0개</span></div>
+            <div class="bulk-pool-container" id="bulkPoolContainer">
+              <div class="no-data" style="width:100%;padding:16px;">대량 풀이 비어있습니다</div>
+            </div>
+            <div class="result-actions">
+              <button class="btn btn-secondary btn-sm" onclick="copyBulkPool()">📋 전체 복사</button>
+              <button class="btn btn-danger btn-sm" onclick="clearBulkPool()">🗑 풀 초기화</button>
+              <div class="result-stats" id="bulkPoolStats"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">📁 생성된 CSV 파일 <span class="badge" id="bulkCsvCount">0개</span></div>
+            <div id="bulkCsvList" class="csv-file-list">
+              <div class="no-data">CSV 파일 없음<br><small>대량 CSV 생성 버튼을 눌러주세요</small></div>
+            </div>
+            <div class="result-actions" style="margin-top:12px;">
+              <button class="btn btn-danger btn-sm" onclick="clearBulkCsvList()">🗑 목록 초기화</button>
+              <div class="result-stats" id="bulkCsvStats"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 반응형 소재 -->
+    <div class="sub-panel" id="sub-rsa">
+      <div class="naver-section">
+        <div>
+          <div class="card">
+            <div class="card-title">⚙ 반응형 소재 설정</div>
+            <div class="ad-settings">
+              <div class="form-group">
+                <label class="form-label">광고그룹 관리</label>
+                <div class="group-list" id="rsaGroupList"><div class="no-data" style="padding:12px;">등록된 그룹 없음</div></div>
+                <div style="display:flex;gap:6px;margin-top:8px;">
+                  <input type="text" id="rsaGroupId" placeholder="광고그룹ID" style="flex:1;">
+                  <input type="text" id="rsaGroupName" placeholder="그룹명(메모)" style="flex:1;">
+                  <button class="btn btn-primary btn-sm" onclick="addRsaGroup()">추가</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">PC URL <span class="req">*</span></label>
+                <input type="url" id="rsaPcUrl" placeholder="https://">
+              </div>
+              <div class="form-group">
+                <label class="form-label">모바일 URL <span class="req">*</span></label>
+                <input type="url" id="rsaMoUrl" placeholder="https://">
+              </div>
+              <hr class="divider">
+              <div id="rsaTitleFields"></div>
+              <button class="btn btn-secondary btn-sm" onclick="addRsaTitleField()" style="margin-bottom:10px;">＋ 제목 추가 (최대 15개)</button>
+              <div id="rsaDescFields"></div>
+              <button class="btn btn-secondary btn-sm" onclick="addRsaDescField()" style="margin-bottom:10px;">＋ 설명 추가 (최대 4개)</button>
+              <hr class="divider">
+              <div class="form-group">
+                <label class="form-label">위치 고정 <small style="color:var(--text-sub);font-weight:400;">(선택)</small></label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div><label class="form-label" style="font-size:11px;">첫번째 제목</label><input type="number" id="rsaFix1" placeholder="제목 번호" min="1" max="15"></div>
+                  <div><label class="form-label" style="font-size:11px;">두번째 제목</label><input type="number" id="rsaFix2" placeholder="제목 번호" min="1" max="15"></div>
+                  <div><label class="form-label" style="font-size:11px;">세번째 제목</label><input type="number" id="rsaFix3" placeholder="제목 번호" min="1" max="15"></div>
+                  <div><label class="form-label" style="font-size:11px;">첫번째 설명</label><input type="number" id="rsaFixD1" placeholder="설명 번호" min="1" max="4"></div>
+                  <div><label class="form-label" style="font-size:11px;">두번째 설명</label><input type="number" id="rsaFixD2" placeholder="설명 번호" min="1" max="4"></div>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="addRsaRow()" style="margin-top:8px;">➕ 목록에 추가</button>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-title">📋 반응형 소재 목록 <span class="badge" id="rsaRowCount">0건</span></div>
+            <div class="ad-table-wrap">
+              <table class="ad-table">
+                <thead><tr><th>그룹ID</th><th>PC URL</th><th>제목1</th><th>제목2</th><th>제목3</th><th>설명1</th><th>설명2</th><th>삭제</th></tr></thead>
+                <tbody id="rsaTbody"><tr><td colspan="8" class="no-data">추가된 소재 없음</td></tr></tbody>
+              </table>
+            </div>
+            <div class="result-actions" style="margin-top:12px;">
+              <button class="btn btn-primary" onclick="downloadRsaCSV()">⬇ 반응형 CSV 다운로드</button>
+              <button class="btn btn-danger btn-sm" onclick="clearRsaRows()">🗑 초기화</button>
+              <div class="result-stats" id="rsaStats"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 단일형 소재 -->
+    <div class="sub-panel" id="sub-single">
+      <div class="naver-section">
+        <div>
+          <div class="card">
+            <div class="card-title">⚙ 단일형 소재 설정</div>
+            <div class="ad-settings">
+              <div class="form-group">
+                <label class="form-label">광고그룹 관리</label>
+                <div class="group-list" id="singleGroupList"><div class="no-data" style="padding:12px;">등록된 그룹 없음</div></div>
+                <div style="display:flex;gap:6px;margin-top:8px;">
+                  <input type="text" id="singleGroupId" placeholder="광고그룹ID" style="flex:1;">
+                  <input type="text" id="singleGroupName" placeholder="그룹명(메모)" style="flex:1;">
+                  <button class="btn btn-primary btn-sm" onclick="addSingleGroup()">추가</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">제목 <span class="req">*</span> <small style="color:var(--text-sub)">(최대 15자)</small></label>
+                <input type="text" id="singleTitle" placeholder="필수" maxlength="15" oninput="countChar(this,'sT1c',15)">
+                <div class="char-counter" id="sT1c">0/15</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">설명 <span class="req">*</span> <small style="color:var(--text-sub)">(최대 45자)</small></label>
+                <textarea id="singleDesc" placeholder="필수" maxlength="45" rows="2" oninput="countChar(this,'sD1c',45)"></textarea>
+                <div class="char-counter" id="sD1c">0/45</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">PC URL <span class="req">*</span></label>
+                <input type="url" id="singlePcUrl" placeholder="https://">
+              </div>
+              <div class="form-group">
+                <label class="form-label">모바일 URL <span class="req">*</span></label>
+                <input type="url" id="singleMoUrl" placeholder="https://">
+              </div>
+              <div class="form-group">
+                <label class="form-label">의료광고 심의필 번호 <small style="color:var(--text-sub);font-weight:400;">(선택, 6~12자)</small></label>
+                <input type="text" id="singleMedical" placeholder="의료광고인 경우만 입력" minlength="6" maxlength="12">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="addSingleRow()" style="margin-top:8px;">➕ 목록에 추가</button>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-title">📋 단일형 소재 목록 <span class="badge" id="singleRowCount">0건</span></div>
+            <div class="ad-table-wrap">
+              <table class="ad-table">
+                <thead><tr><th>그룹ID</th><th>제목</th><th>설명</th><th>PC URL</th><th>모바일 URL</th><th>심의필번호</th><th>삭제</th></tr></thead>
+                <tbody id="singleTbody"><tr><td colspan="7" class="no-data">추가된 소재 없음</td></tr></tbody>
+              </table>
+            </div>
+            <div class="result-actions" style="margin-top:12px;">
+              <button class="btn btn-primary" onclick="downloadSingleCSV()">⬇ 단일형 CSV 다운로드</button>
+              <button class="btn btn-danger btn-sm" onclick="clearSingleRows()">🗑 초기화</button>
+              <div class="result-stats" id="singleStats"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭3: 의도 라이브러리 -->
+  <div class="tab-panel" id="tab-library">
+    <div class="card">
+      <div class="card-title">📚 의도 라이브러리</div>
+      <div class="info-box">⭐ 즐겨찾기 카테고리는 상단에 고정됩니다 · 단어 클릭 시 믹서 마지막 박스에 추가됩니다 · 변경사항은 자동 저장됩니다</div>
+      <div class="library-toolbar">
+        <input type="text" id="newCatName" placeholder="새 카테고리명 입력..." style="max-width:200px;">
+        <button class="btn btn-primary btn-sm" onclick="addCategory()">＋ 카테고리 추가</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportLibrary()">📤 내보내기 (JSON)</button>
+        <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
+          📥 가져오기 (JSON)<input type="file" accept=".json" onchange="importLibrary(event)" style="display:none;">
+        </label>
+        <button class="btn btn-danger btn-sm" onclick="resetLibrary()">↺ 기본값으로 초기화</button>
+      </div>
+      <div id="favCategories"></div>
+      <div id="libraryCategories"></div>
+    </div>
+  </div>
+
+  <!-- 탭4: 키워드 풀 -->
+  <div class="tab-panel" id="tab-pool">
+    <div class="card">
+      <div class="card-title">🗂 일반 키워드 풀 <span class="badge" id="poolCount">0개</span></div>
+      <div class="pool-container" id="poolContainer"><div class="no-data" style="width:100%;">풀이 비어있습니다</div></div>
+      <div class="result-actions" style="margin-top:10px;">
+        <button class="btn btn-secondary btn-sm" onclick="copyPool()">📋 전체 복사</button>
+        <button class="btn btn-secondary btn-sm" onclick="downloadPool()">💾 TXT 다운</button>
+        <button class="btn btn-danger btn-sm" onclick="clearPool()">🗑 풀 초기화</button>
+        <div class="result-stats" id="poolStats"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ================================================================
+// 지역 데이터 (원본 동일)
+// ================================================================
+const REGION_DATA = {
+  "서울특별시": { type: "special", districts: { "종로구": ["청운효자동","사직동","삼청동","부암동","평창동","무악동","교남동","가회동","혜화동","명륜진명동","창신1동","창신2동","창신3동","숭인1동","숭인2동"], "중구": ["소공동","회현동","명동","필동","장충동","광희동","을지로동","신당동","다산동","약수동","청구동","신당5동","동화동","황학동","중림동"], "용산구": ["후암동","용산2가동","남영동","청파동","원효로1동","원효로2동","효창동","용문동","한강로동","이촌1동","이촌2동","이태원1동","이태원2동","한남동","서빙고동","보광동"], "성동구": ["왕십리2동","왕십리도선동","마장동","사근동","행당1동","행당2동","응봉동","금호1가동","금호2,3가동","금호4가동","옥수동","성수1가1동","성수1가2동","성수2가1동","성수2가3동","송정동","용답동"], "광진구": ["중곡1동","중곡2동","중곡3동","중곡4동","능동","구의1동","구의2동","구의3동","광장동","자양1동","자양2동","자양3동","자양4동","화양동","군자동"], "동대문구": ["용신동","제기동","전농1동","전농2동","답십리1동","답십리2동","장안1동","장안2동","청량리동","회기동","휘경1동","휘경2동","이문1동","이문2동"], "중랑구": ["면목본동","면목2동","면목3,8동","면목4동","면목5동","면목7동","상봉1동","상봉2동","중화1동","중화2동","묵1동","묵2동","망우본동","망우3동","신내1동","신내2동"], "성북구": ["성북동","삼선동","동선동","안암동","보문동","정릉1동","정릉2동","정릉3동","정릉4동","길음1동","길음2동","종암동","월곡1동","월곡2동","장위1동","장위2동","장위3동","석관동"], "강북구": ["번1동","번2동","번3동","수유1동","수유2동","수유3동","미아동","송중동","송천동","삼각산동","솔샘동","인수동"], "도봉구": ["쌍문1동","쌍문2동","쌍문3동","쌍문4동","방학1동","방학2동","방학3동","창1동","창2동","창3동","창4동","도봉1동","도봉2동"], "노원구": ["월계1동","월계2동","월계3동","공릉1동","공릉2동","하계1동","하계2동","중계본동","중계1동","중계2,3동","중계4동","상계1동","상계2동","상계3,4동","상계5동","상계6,7동","상계8동","상계9동","상계10동"], "은평구": ["녹번동","불광1동","불광2동","갈현1동","갈현2동","구산동","대조동","응암1동","응암2동","응암3동","역촌동","신사1동","신사2동","증산동","수색동","진관동"], "서대문구": ["천연동","북아현동","충현동","신촌동","연희동","홍제1동","홍제2동","홍제3동","홍은1동","홍은2동","남가좌1동","남가좌2동","북가좌1동","북가좌2동"], "마포구": ["공덕동","아현동","도화동","용강동","대흥동","염리동","신수동","서강동","서교동","합정동","망원1동","망원2동","연남동","성산1동","성산2동","상암동"], "양천구": ["신정1동","신정2동","신정3동","신정4동","신정6동","신정7동","목1동","목2동","목3동","목4동","목5동"], "강서구": ["염창동","등촌1동","등촌2동","등촌3동","화곡1동","화곡2동","화곡3동","화곡4동","화곡6동","화곡8동","가양1동","가양2동","가양3동","발산1동","공항동","방화1동","방화2동","방화3동"], "구로구": ["신도림동","구로1동","구로2동","구로3동","구로4동","구로5동","가리봉동","수궁동","고척1동","고척2동","개봉1동","개봉2동","개봉3동","오류1동","오류2동","궁동","항동"], "금천구": ["가산동","독산1동","독산2동","독산3동","독산4동","시흥1동","시흥2동","시흥3동","시흥4동","시흥5동"], "영등포구": ["영등포동","영등포본동","당산1동","당산2동","도림동","문래동","양평1동","양평2동","신길1동","신길3동","신길4동","신길5동","신길6동","신길7동","대림1동","대림2동","대림3동"], "동작구": ["노량진1동","노량진2동","상도1동","상도2동","상도3동","상도4동","대방동","신대방1동","신대방2동","흑석동","동작동","사당1동","사당2동","사당3동","사당4동","사당5동"], "관악구": ["보라매동","청림동","성현동","행운동","낙성대동","청룡동","은천동","중앙동","인헌동","남현동","서원동","신원동","서림동","난향동","신림동","난곡동","조원동","대학동"], "서초구": ["방배본동","방배1동","방배2동","방배4동","양재1동","양재2동","내곡동","서초1동","서초2동","서초3동","서초4동","잠원동","반포본동","반포1동","반포2동","반포3동","반포4동"], "강남구": ["역삼1동","역삼2동","개포1동","개포2동","개포4동","세곡동","자곡동","율현동","일원본동","일원1동","일원2동","수서동","도곡1동","도곡2동","대치1동","대치2동","대치4동","압구정동","신사동","논현1동","논현2동","청담동","삼성1동","삼성2동"], "송파구": ["풍납1동","풍납2동","거여1동","거여2동","마천1동","마천2동","방이1동","방이2동","오륜동","오금동","송파1동","송파2동","석촌동","삼전동","가락본동","가락1동","가락2동","문정1동","문정2동","장지동","위례동","잠실본동","잠실2동","잠실3동","잠실4동","잠실6동","잠실7동"], "강동구": ["강일동","상일동","명일1동","명일2동","고덕1동","고덕2동","암사1동","암사2동","암사3동","천호1동","천호2동","천호3동","성내1동","성내2동","성내3동","길동","둔촌1동","둔촌2동"] } },
+  "부산광역시": { type: "metro", districts: { "중구": ["중앙동","동광동","대청동","보수동","부평동","광복동","남포동","영주동"], "서구": ["동대신1동","동대신2동","동대신3동","서대신1동","서대신3동","서대신4동","부민동","아미동","초장동","충무동","남부민1동","남부민2동","암남동"], "동구": ["초량1동","초량2동","초량3동","초량6동","수정1동","수정2동","수정3동","수정4동","수정5동","좌천동","범일1동","범일2동","범일3동","범일5동"], "영도구": ["남항동","영선1동","영선2동","신선동","봉래1동","봉래2동","청학1동","청학2동","동삼1동","동삼2동","동삼3동"], "부산진구": ["부전1동","부전2동","연지동","초읍동","양정1동","양정2동","전포1동","전포2동","범천1동","범천2동","당감1동","당감2동","당감3동","당감4동","개금1동","개금2동","개금3동","가야1동","가야2동"], "동래구": ["수민동","복산동","명륜동","온천1동","온천2동","온천3동","사직1동","사직2동","사직3동","안락1동","안락2동","명장1동","명장2동"], "남구": ["대연1동","대연2동","대연3동","대연4동","대연5동","대연6동","용호1동","용호2동","용호3동","용호4동","용당동","감만1동","감만2동","우암동","문현1동","문현2동","문현3동","문현4동"], "북구": ["구포1동","구포2동","구포3동","금곡동","화명1동","화명2동","화명3동","덕천1동","덕천2동","덕천3동","만덕1동","만덕2동","만덕3동"], "해운대구": ["우1동","우2동","우3동","우4동","좌1동","좌2동","좌3동","좌4동","중1동","중2동","송정동","반여1동","반여2동","반여3동","반여4동","반송1동","반송2동","재송1동","재송2동"], "사하구": ["괴정1동","괴정2동","괴정3동","괴정4동","하단1동","하단2동","신평1동","신평2동","장림1동","장림2동","다대1동","다대2동","구평동","감천1동","감천2동"], "금정구": ["서1동","서2동","서3동","금사동","회동동","청룡동","남산동","구서1동","구서2동","장전1동","장전2동","부곡1동","부곡2동","부곡3동","부곡4동","금성동"], "강서구": ["대저1동","대저2동","강동동","명지1동","명지2동","가락동","녹산동","가덕도동"], "연제구": ["거제1동","거제2동","거제3동","거제4동","연산1동","연산2동","연산3동","연산4동","연산5동","연산6동","연산8동","연산9동"], "수영구": ["남천1동","남천2동","수영동","망미1동","망미2동","광안1동","광안2동","광안3동","광안4동"], "사상구": ["삼락동","모라1동","모라2동","모라3동","덕포1동","덕포2동","괘법동","감전동","주례1동","주례2동","주례3동","학장동","엄궁동"], "기장군": ["기장읍","장안읍","정관읍","일광읍","철마면"] } },
+  "대구광역시": { type: "metro", districts: { "중구": ["성내1동","성내2동","성내3동","동인동","삼덕동","수창동","약령시동","대신동","남산1동","남산2동","남산3동","남산4동","대봉1동","대봉2동"], "동구": ["신암1동","신암2동","신암3동","신암4동","신암5동","신천1,2동","신천3동","신천4동","효목1동","효목2동","도평동","불로봉무동","지저동","동촌동","방촌동","해안동","안심1동","안심2동","안심3,4동","혁신동"], "서구": ["평리1동","평리2동","평리3동","평리4동","평리5동","평리6동","내당1동","내당2동","내당3동","내당4동","비산1동","비산2동","비산3동","비산4동","비산5동","비산6동","비산7동","원대동"], "남구": ["이천동","봉덕1동","봉덕2동","봉덕3동","대명1동","대명2동","대명3동","대명4동","대명5동","대명6동","대명9동","대명10동","대명11동"], "북구": ["고성동","칠성동","침산1동","침산2동","침산3동","노원동","학정동","태전1동","태전2동","관음동","동천동","검단동","읍내동","산격1동","산격2동","산격3동","산격4동","대현동","복현1동","복현2동","구암동"], "수성구": ["상동","황금1동","황금2동","범어1동","범어2동","범어3동","범어4동","만촌1동","만촌2동","만촌3동","수성1가동","수성2,3가동","수성4가동","중동","고모동","사월동","욱수동","신매동","가천동","지산1동","지산2동","범물1동","범물2동","파동","이천동"], "달서구": ["성당동","두류1,2동","두류3동","감삼동","죽전동","용산1동","용산2동","이곡1동","이곡2동","신당동","월성1동","월성2동","진천동","유천1동","유천2동","대천동","본리동","본동","상인1동","상인2동","상인3동","도원동","갈산동","파호동","호산동"], "달성군": ["화원읍","논공읍","다사읍","유가읍","옥포읍","현풍읍","가창면","하빈면","구지면"] } },
+  "인천광역시": { type: "metro", districts: { "중구": ["중동","신흥동","신포동","연안동","항동","선화동","동인천동","개항장동","도원동","율목동","운서동","중산동","운남동","영종동","용유동"], "동구": ["만석동","화수1,2동","화수화평동","송현1,2동","송현3동","창영동","금창동"], "미추홀구": ["숭의1,4동","숭의2동","숭의3동","용현1,2,3동","용현4동","용현5동","학익1동","학익2동","도화1동","도화2,3동","주안1동","주안2동","주안3동","주안4동","주안5동","주안6동","주안7동","주안8동","관교동","문학동"], "연수구": ["옥련1동","옥련2동","선학동","연수1동","연수2동","연수3동","청학동","동춘1동","동춘2동","동춘3동","송도1동","송도2동","송도3동","송도4동","송도5동"], "남동구": ["구월1동","구월2동","구월3동","구월4동","간석1동","간석2동","간석3동","간석4동","만수1동","만수2동","만수3동","만수4동","만수5동","만수6동","장수서창동","서창2동","남촌도림동","수산고잔동","논현고잔동","논현1동","논현2동"], "부평구": ["부평1동","부평2동","부평3동","부평4동","부평5동","부평6동","산곡1동","산곡2동","산곡3동","산곡4동","청천1동","청천2동","일신동","십정1동","십정2동","삼산1동","삼산2동","갈산1동","갈산2동"], "계양구": ["효성1동","효성2동","계산1동","계산2동","계산3동","계산4동","작전동","작전서운동","서운동","임학동","용종동","병방동","박촌동","동양동","귤현동"], "서구": ["가좌1동","가좌2동","가좌3동","가좌4동","신현원창동","석남1동","석남2동","석남3동","연희동","검암경서동","공촌동","신기동","오류왕길동","당하동","원당동","마전동","불로동","대곡동","청라1동","청라2동","청라3동"], "강화군": ["강화읍","선원면","불은면","길상면","화도면","양도면","내가면","하점면","양사면","송해면","교동면","삼산면","서도면"], "옹진군": ["북도면","덕적면","영흥면","대청면","백령면","연평면","자월면"] } },
+  "광주광역시": { type: "metro", districts: { "동구": ["궁동","충장동","계림1동","계림2동","산수1동","산수2동","지산1동","지산2동","서석동","학동","운림동","동명동","남광주동","지원1동","지원2동"], "서구": ["양동","농성1동","농성2동","광천동","유덕동","치평동","상무1동","상무2동","서창동","마륵동","벽진동","금호1동","금호2동","화정1동","화정2동","화정3동","화정4동","내방동"], "남구": ["사직동","양림동","방림1동","방림2동","봉선1동","봉선2동","주월1동","주월2동","월산동","월산4동","월산5동","덕남동","진월동","송암동","대촌동"], "북구": ["중흥1동","중흥2동","중흥3동","유동","임동","신안동","용봉동","운암1동","운암2동","운암3동","동림동","우산동","각화동","문화동","풍향동","두암1동","두암2동","두암3동","석곡동","오치1동","오치2동","삼각동","일곡동","매곡동","건국동","양산동","신용동","문흥1동","문흥2동","충효동","생용동"], "광산구": ["송정1동","송정2동","도산동","신흥동","어룡동","우산동","월곡1동","월곡2동","비아동","첨단1동","첨단2동","신가동","운남동","운북동","하남동","평동","임곡동","삼도동","본량동"] } },
+  "대전광역시": { type: "metro", districts: { "동구": ["원동","성남동","인동","효동","삼성동","대동","자양동","가양1동","가양2동","용운동","대학동","신흥동","판암1동","판암2동","신상동","세천동","낭월동","직동","비룡동","삼괴동","홍도동","삼정동"], "중구": ["은행선화동","대흥동","목동","중촌동","문창동","석교동","대사동","부사동","용두동","오류동","태평1동","태평2동","태평3동","태평4동","유천1동","유천2동","문화1동","문화2동","산성동","안영동"], "서구": ["도마1동","도마2동","변동","용문동","탄방동","둔산1동","둔산2동","둔산3동","갈마1동","갈마2동","월평1동","월평2동","월평3동","가수원동","관저1동","관저2동","정림동","흑석동","내동"], "유성구": ["온천1동","온천2동","노은1동","노은2동","노은3동","신성동","전민동","구즉동","관평동","학하동","원신흥동","송강동","대정동","금고동","방동","봉산동","세동","반석동","장대동","도룡동"], "대덕구": ["오정동","중리동","석봉동","목상동","법동","송촌동","자운동","신탄진동","비래동","읍내동","미호동","덕암동","상서동","와동"] } },
+  "울산광역시": { type: "metro", districts: { "중구": ["학성동","복산동","성안동","옥교동","우정동","이예동","태화동","다운동","약사동","반구1동","반구2동","교동"], "남구": ["신정1동","신정2동","신정3동","신정4동","신정5동","달동","삼산동","수암동","야음장생포동","선암동","신선동","두왕동"], "동구": ["방어동","화정동","일산동","전하1동","전하2동","동부동","서부동","대송동"], "북구": ["농소1동","농소2동","농소3동","호계동","연암동","강동동","효문동","천곡동","매곡동","송정동","중산동"], "울주군": ["언양읍","온양읍","청량읍","범서읍","삼남읍","온산읍","서생면","웅촌면","삼동면","두동면","두서면","상북면"] } },
+  "세종특별자치시": { type: "sejong", dong: ["한솔동","도담동","아름동","종촌동","고운동","보람동","대평동","소담동","반곡동","새롬동","나성동","다정동","어진동","전의면","전동면","소정면","금남면","장군면","연기면","연동면","부강면","대화동","연서면"] },
+  "경기도": { type: "do", cities: { "수원시": { hasGu: true, gu: { "장안구": ["파장동","정자1동","정자2동","정자3동","율전동","천천동","영화동","송죽동","조원1동","조원2동","연무동"], "권선구": ["세류1동","세류2동","세류3동","권선1동","권선2동","평동","서둔동","구운동","금곡동","호매실동","입북동","오목천동"], "팔달구": ["매교동","매산동","중동","화서1동","화서2동","지동","우만1동","우만2동","인계동"], "영통구": ["매탄1동","매탄2동","매탄3동","매탄4동","원천동","영통1동","영통2동","영통3동","태장1동","태장2동","하동"] } }, "성남시": { hasGu: true, gu: { "수정구": ["신흥1동","신흥2동","신흥3동","태평1동","태평2동","태평3동","태평4동","수진1동","수진2동","단대동","은행1동","은행2동","금광1동","금광2동","산성동","양지동","복정동","위례동"], "중원구": ["성남동","중앙동","금광1동","은행동","상대원1동","상대원2동","상대원3동","하대원동","도촌동"], "분당구": ["분당동","수내1동","수내2동","수내3동","정자1동","정자2동","정자3동","서현1동","서현2동","이매1동","이매2동","야탑1동","야탑2동","야탑3동","판교동","백현동","운중동","삼평동","구미1동","구미2동","금곡동","동원1동","동원2동"] } }, "고양시": { hasGu: true, gu: { "덕양구": ["효자동","창릉동","행신1동","행신2동","행신3동","행신4동","화정1동","화정2동","능곡동","원흥동","삼송동","성사1동","성사2동","주교동","관산동","동산동","흥도동","벽제동","화전동","토당동","덕은동"], "일산동구": ["식사동","중산동","정발산동","마두1동","마두2동","강촌동","백석1동","백석2동","장항1동","장항2동","풍동","산황동"], "일산서구": ["주엽1동","주엽2동","대화동","탄현1동","탄현2동","일산1동","일산2동","일산3동","덕이동","가좌동","구산동"] } }, "용인시": { hasGu: true, gu: { "처인구": ["김량장동","역북동","삼가동","유방동","고림동","마평동","운학동","호동","포곡읍","모현읍","이동읍","남사읍","원삼면","백암면","양지면"], "기흥구": ["신갈동","구갈동","상갈동","보라동","지곡동","공세동","고매동","농서동","서천동","영덕1동","영덕2동","영덕3동","언남동","동백1동","동백2동","동백3동","중동"], "수지구": ["풍덕천1동","풍덕천2동","수지1동","수지2동","신봉동","죽전1동","죽전2동","죽전3동","상현1동","상현2동","상현3동","성복동","광교동"] } }, "안양시": { hasGu: true, gu: { "만안구": ["안양1동","안양2동","안양3동","안양4동","안양5동","안양6동","안양7동","안양8동","안양9동","박달1동","박달2동","석수1동","석수2동","석수3동"], "동안구": ["비산1동","비산2동","비산3동","달안동","관양1동","관양2동","부림동","평촌동","귀인동","호계1동","호계2동","호계3동"] } }, "안산시": { hasGu: true, gu: { "상록구": ["사1동","사2동","사3동","건건동","본오1동","본오2동","본오3동","반월동","수암동","이동"], "단원구": ["고잔1동","고잔2동","중앙동","호수동","초지동","원곡본동","원곡1동","원곡2동","대부동동","대부남동","대부북동","선감동","풍도동"] } }, "부천시": { hasGu: false, dong: ["소사동","심곡동","심곡본동","춘의동","도당동","약대동","소사본1동","소사본3동","괴안동","역곡1동","역곡2동","역곡3동","오정동","여월동","작동","원종1동","원종2동","고강동","대산동","삼정동","중1동","중2동","중3동","중4동","원미1동","원미2동","상동","중동","심곡1동"] }, "평택시": { hasGu: false, dong: ["팽성읍","안중읍","포승읍","청북읍","진위면","서탄면","고덕면","오성면","현덕면","중앙동","서정동","합정동","비전1동","비전2동","원평1동","원평2동","신평동","지산동","송탄동","신장1동","신장2동","통복동","동삭동"] }, "광명시": { hasGu: false, dong: ["광명1동","광명2동","광명3동","광명4동","광명5동","광명6동","광명7동","소하1동","소하2동","철산1동","철산2동","철산3동","철산4동","하안1동","하안2동","하안3동","하안4동","학온동","노온사동"] }, "화성시": { hasGu: false, dong: ["향남읍","남양읍","봉담읍","우정읍","장안면","양감면","정남면","마도면","송산면","서신면","팔탄면","비봉면","매송면","동탄1동","동탄2동","동탄3동","동탄4동","동탄5동","동탄6동","동탄7동","동탄8동","병점1동","병점2동","반월동","기산동","진안동","능동","안녕동","반정동","청계동"] }, "시흥시": { hasGu: false, dong: ["대야동","신천동","신현동","은행동","매화동","목감동","군자동","능곡동","정왕1동","정왕2동","정왕3동","정왕4동","배곧1동","배곧2동","과림동"] }, "파주시": { hasGu: false, dong: ["문산읍","파주읍","법원읍","조리읍","월롱면","탄현면","광탄면","파평면","적성면","군내면","진동면","진서면","운정1동","운정2동","운정3동","금촌1동","금촌2동","금촌3동","교하동"] }, "김포시": { hasGu: false, dong: ["통진읍","고촌읍","양촌읍","걸포북변동","사우동","풍무동","장기본동","장기동","구래동","마산동","운양동"] }, "광주시": { hasGu: false, dong: ["경안동","광남동","초월읍","곤지암읍","도척면","퇴촌면","남종면","남한산성면","오포읍"] }, "이천시": { hasGu: false, dong: ["부발읍","장호원읍","모가면","호법면","마장면","대월면","율면","설성면","백사면","신둔면","중리동","창전동","증일동","증포동"] }, "안성시": { hasGu: false, dong: ["안성1동","안성2동","안성3동","보개면","금광면","서운면","미양면","대덕면","양성면","원곡면","공도읍","죽산면","삼죽면","일죽면","고삼면"] }, "여주시": { hasGu: false, dong: ["여주읍","점동면","흥천면","금사면","북내면","강천면","대신면","능서면","산북면","오학동","삼교동","홍문동"] }, "양평군": { hasGu: false, dong: ["양평읍","강상면","강하면","양서면","옥천면","서종면","단월면","청운면","양동면","지평면","용문면","개군면"] }, "가평군": { hasGu: false, dong: ["가평읍","설악면","청평면","상면","조종면","북면"] }, "연천군": { hasGu: false, dong: ["연천읍","전곡읍","청산면","백학면","미산면","왕징면","신서면","중면","장남면","군남면"] }, "포천시": { hasGu: false, dong: ["포천1동","포천2동","소흘읍","군내면","내촌면","가산면","신북면","창수면","영중면","일동면","이동면","화현면","관인면","영북면"] }, "동두천시": { hasGu: false, dong: ["생연1동","생연2동","중앙동","보산동","광암동","신흥동","송내동","상패동"] }, "구리시": { hasGu: false, dong: ["갈매동","인창동","교문1동","교문2동","수택1동","수택2동","수택3동","토평동"] }, "남양주시": { hasGu: false, dong: ["화도읍","퇴계원읍","오남읍","진접읍","진건읍","별내면","수동면","조안면","와부읍","금곡동","양정동","평내동","호평동","다산1동","다산2동","별내동"] }, "의왕시": { hasGu: false, dong: ["오전동","내손1동","내손2동","청계동","고천동","부곡동","백운동"] }, "군포시": { hasGu: false, dong: ["산본1동","산본2동","금정동","당동","둔대동","부곡동","속달동","대야미동"] }, "하남시": { hasGu: false, dong: ["덕풍1동","덕풍2동","덕풍3동","창우동","감일동","미사1동","미사2동","미사3동","위례동","망월동","초이동","춘궁동","교산동"] }, "오산시": { hasGu: false, dong: ["오산동","대원동","남촌동","신장동","초평동","세마동","고현동","중앙동","누읍동","가장동","궐동"] }, "과천시": { hasGu: false, dong: ["중앙동","별양동","부림동","갈현동","과천동","문원동","막계동"] }, "의정부시": { hasGu: false, dong: ["의정부1동","의정부2동","호원1동","호원2동","장암동","신곡1동","신곡2동","용현동","민락동","낙양동","자금동"] } } },
+  "강원특별자치도": { type: "do", cities: { "춘천시": { hasGu: false, dong: ["조운동","약사명동","죽림동","근화동","소양동","효자1동","효자2동","효자3동","석사동","퇴계동","후평1동","후평2동","후평3동","신북읍","동면","동산면","신동면","동내면","서면","북산면","사북면","남산면","남면","강촌면"] }, "원주시": { hasGu: false, dong: ["중앙동","일산동","개운동","명륜1동","명륜2동","단계동","우산동","학성동","태장1동","태장2동","봉산동","행구동","무실동","관설동","반곡관설동","지정면","호저면","귀래면","부론면","소초면","흥업면","판부면","신림면","문막읍","서원면"] }, "강릉시": { hasGu: false, dong: ["홍제동","중앙동","옥천동","포남1동","포남2동","초당동","강남동","성산면","왕산면","구정면","강동면","옥계면","사천면","연곡면","주문진읍","노암동","교동"] }, "동해시": { hasGu: false, dong: ["천곡동","발한동","망상동","동호동","묵호동","북삼동","삼화동","부곡동","달방동","이도동","지흥동","구미동","심곡동","지가동"] }, "태백시": { hasGu: false, dong: ["황지동","장성동","문곡소도동","통동","삼수동","혈동","금천동","상장동","화전동","창죽동"] }, "속초시": { hasGu: false, dong: ["노학동","조양동","교동","금호동","청학동","중앙동","영랑동","동명동","설악동","대포동","수복동","도문동"] }, "삼척시": { hasGu: false, dong: ["성내동","교동","남양동","정라동","근덕면","원덕읍","도계읍","미로면","가곡면","신기면","하장면","노곡면"] }, "홍천군": { hasGu: false, dong: ["홍천읍","화촌면","두촌면","내촌면","서석면","동면","남면","서면","북방면","내면"] }, "횡성군": { hasGu: false, dong: ["횡성읍","우천면","안흥면","둔내면","갑천면","청일면","공근면","서원면","강림면"] }, "영월군": { hasGu: false, dong: ["영월읍","상동읍","수주면","한반도면","김삿갓면","북면","남면","산솔면","무릉도원면"] }, "평창군": { hasGu: false, dong: ["평창읍","미탄면","방림면","대화면","봉평면","용평면","진부면","대기면"] }, "정선군": { hasGu: false, dong: ["정선읍","고한읍","사북읍","신동읍","남면","북평면","임계면","화암면","여량면"] }, "철원군": { hasGu: false, dong: ["갈말읍","동송읍","철원읍","근남면","근동면","근북면","서면","묘장면"] }, "화천군": { hasGu: false, dong: ["화천읍","간동면","하남면","상서면","사내면"] }, "양구군": { hasGu: false, dong: ["양구읍","남면","동면","방산면","해안면"] }, "인제군": { hasGu: false, dong: ["인제읍","남면","북면","기린면","서화면","상남면"] }, "고성군": { hasGu: false, dong: ["간성읍","거진읍","현내면","죽왕면","토성면","수동면"] }, "양양군": { hasGu: false, dong: ["양양읍","서면","손양면","현남면","현북면","강현면"] } } },
+  "충청북도": { type: "do", cities: { "청주시": { hasGu: true, gu: { "상당구": ["중앙동","성안동","탑대성동","영운동","금천동","용암1동","용암2동","용정동","방서동","월오동","오근장동","낭성면","미원면","가덕면","남일면","문의면"], "서원구": ["사직1동","사직2동","사직3동","분평동","산남동","모충동","수곡1동","수곡2동","성화개신죽림동","미평동","현도면"], "흥덕구": ["가경동","복대1동","복대2동","봉명1동","봉명2동","운천신봉동","강서1동","강서2동","신전동","옥산면","오송읍","오창읍"], "청원구": ["내덕1동","내덕2동","우암동","율량사천동","주중동","주성동","오동동","북이면","내수읍","북일면"] } }, "충주시": { hasGu: false, dong: ["중앙동","성내충인동","교현안림동","교현2동","용산동","지현동","문화동","호암직동","달천동","봉방동","칠금금릉동","연수동","목행용탄동","가금면","엄정면","소태면","살미면","수안보면","대소원면","신니면","노은면","앙성면","중앙탑면","금가면","동량면","산척면","주덕읍"] }, "제천시": { hasGu: false, dong: ["중앙동","남현동","서부동","화산동","동현동","두학동","신백동","의림지동","장락동","교동","청전동","모산동","강제동","수산면","백운면","봉양읍","금성면","청풍면","원서면","덕산면","한수면","송학면"] }, "보은군": { hasGu: false, dong: ["보은읍","속리산면","장안면","마로면","탄부면","삼승면","수한면","회남면","회인면","내북면","산외면"] }, "옥천군": { hasGu: false, dong: ["옥천읍","동이면","안남면","안내면","청성면","청산면","이원면","군서면","군북면"] }, "영동군": { hasGu: false, dong: ["영동읍","용산면","황간면","추풍령면","매곡면","상촌면","양강면","용화면","학산면","양산면","심천면"] }, "증평군": { hasGu: false, dong: ["증평읍","도안면"] }, "진천군": { hasGu: false, dong: ["진천읍","덕산읍","초평면","문백면","백곡면","이월면","광혜원면"] }, "괴산군": { hasGu: false, dong: ["괴산읍","감물면","장연면","연풍면","유석면","칠성면","문광면","청천면","청안면","사리면","소수면","불정면"] }, "음성군": { hasGu: false, dong: ["음성읍","금왕읍","소이면","원남면","맹동면","대소면","삼성면","생극면","감곡면"] }, "단양군": { hasGu: false, dong: ["단양읍","매포읍","단성면","적성면","어상천면","가곡면","영춘면","대강면"] } } },
+  "충청남도": { type: "do", cities: { "천안시": { hasGu: true, gu: { "동남구": ["중앙동","문화동","원성1동","원성2동","신방동","청룡동","성정1동","성정2동","쌍용1동","쌍용2동","쌍용3동","신안동","봉명동","일봉동","구룡동","용곡동","광덕면","동면","병천면","수신면","목천읍","북면","성남면","성거읍","풍세면"], "서북구": ["성환읍","직산읍","입장면","불당동","백석동","두정동","부성동","업성동"] } }, "공주시": { hasGu: false, dong: ["중학동","반죽동","웅진동","금흥동","신관동","월송동","봉황동","교동","우성면","사곡면","정안면","유구읍","이인면","탄천면","계룡면","반포면","의당면","장기면"] }, "보령시": { hasGu: false, dong: ["대천1동","대천2동","대천3동","대천4동","대천5동","오천면","천북면","청소면","청라면","남포면","주산면","미산면","성주면","웅천읍","주포면"] }, "아산시": { hasGu: false, dong: ["온양1동","온양2동","온양3동","온양4동","온양5동","온양6동","배방읍","탕정면","음봉면","둔포면","영인면","인주면","선장면","도고면","신창면"] }, "서산시": { hasGu: false, dong: ["동문동","서문동","읍내동","석남동","갈산동","예천동","잠홍동","덕지천동","부석면","팔봉면","지곡면","성연면","음암면","운산면","해미면","고북면","인지면","대산읍"] }, "논산시": { hasGu: false, dong: ["화지동","부창동","취암동","등화동","내동","광석면","노성면","상월면","부적면","연무읍","양촌면","가야곡면","은진면","채운면","성동면","강경읍","연산면"] }, "계룡시": { hasGu: false, dong: ["금암1동","금암2동","엄사면","두마면","신도안면"] }, "당진시": { hasGu: false, dong: ["당진1동","당진2동","당진3동","합덕읍","순성면","우강면","채운면","신평면","송악읍","고대면","석문면","대호지면","정미면","면천면"] }, "금산군": { hasGu: false, dong: ["금산읍","금성면","제원면","부리면","군북면","남이면","진산면","복수면","추부면"] }, "부여군": { hasGu: false, dong: ["부여읍","규암면","은산면","외산면","내산면","구룡면","홍산면","옥산면","남면","충화면","양화면","임천면","장암면","세도면","석성면","초촌면"] }, "서천군": { hasGu: false, dong: ["장항읍","서천읍","마서면","화양면","기산면","한산면","마산면","시초면","판교면","문산면","비인면","종천면"] }, "청양군": { hasGu: false, dong: ["청양읍","운곡면","대치면","정산면","목면","청남면","장평면","남양면","화성면","비봉면"] }, "홍성군": { hasGu: false, dong: ["홍성읍","홍북읍","광천읍","홍동면","장곡면","은하면","결성면","서부면","갈산면","구항면"] }, "예산군": { hasGu: false, dong: ["예산읍","삽교읍","대술면","신양면","광시면","대흥면","응봉면","덕산면","봉산면","고덕면","신암면","오가면"] }, "태안군": { hasGu: false, dong: ["태안읍","안면읍","고남면","남면","근흥면","소원면","원북면","이원면"] } } },
+  "전라북도": { type: "do", cities: { "전주시": { hasGu: true, gu: { "완산구": ["중앙동","풍남동","노송동","중화산1동","중화산2동","서서학동","동서학동","효자1동","효자2동","효자3동","효자4동","효자5동","삼천1동","삼천2동","삼천3동","평화1동","평화2동","평화동"], "덕진구": ["덕진동","진북동","금암1동","금암2동","팔복동","우아1동","우아2동","인후1동","인후2동","인후3동","호성동","여의동","반월동","송천1동","송천2동","조촌동","만성동","중인동","동산동"] } }, "군산시": { hasGu: false, dong: ["중앙동","신영동","명산동","평화동","삼학동","월명동","미성동","해신동","경암동","나운1동","나운2동","나운3동","소룡동","오식도동","개정면","회현면","임피면","서수면","대야면","성산면","나포면","옥구읍","옥산면","옥도면","미면","옥서면"] }, "익산시": { hasGu: false, dong: ["중앙동","인화동","창인동","마동","북일동","모현동","어양동","금마면","여산면","왕궁면","춘포면","낭산면","망성면","함열읍","웅포면","성당면","용동면","용안면","황등면","함라면","오산면","팔봉면","동산동","평화동","목천동","영등1동","영등2동","신동","정족동","부송동"] }, "정읍시": { hasGu: false, dong: ["중앙동","장명동","상평동","연지동","시기동","수성동","진산동","내장동","소성면","고부면","영원면","덕천면","입암면","신태인읍","태인면","칠보면","산내면","정우면","이평면","감곡면","옹동면","북면","산외면"] }, "남원시": { hasGu: false, dong: ["동충동","하정동","쾌정동","갈치동","향교동","고죽동","왕정동","노암동","금동","금지면","대강면","대산면","사매면","산내면","산동면","주천면","이백면","아영면","운봉읍","보절면","송동면","주생면","수지면","인월면"] }, "김제시": { hasGu: false, dong: ["요촌동","검산동","교월동","공덕면","백산면","용지면","백구면","부용면","성덕면","금구면","만경읍","죽산면","황산면","금산면","봉남면","청하면","월촌면","순동","신풍동","금성동","서암동","신곡동","흥사동"] }, "완주군": { hasGu: false, dong: ["삼례읍","봉동읍","용진읍","상관면","이서면","소양면","구이면","고산면","비봉면","운주면","화산면","동상면","경천면"] }, "진안군": { hasGu: false, dong: ["진안읍","용담면","안천면","동향면","상전면","백운면","성수면","마령면","부귀면","정천면","주천면"] }, "무주군": { hasGu: false, dong: ["무주읍","무풍면","설천면","적상면","안성면","부남면"] }, "장수군": { hasGu: false, dong: ["장수읍","산서면","번암면","장계면","천천면","계남면","계북면"] }, "임실군": { hasGu: false, dong: ["임실읍","청웅면","운암면","신평면","성수면","둔남면","신덕면","삼계면","관촌면","강진면","덕치면","지사면"] }, "순창군": { hasGu: false, dong: ["순창읍","인계면","동계면","적성면","유등면","풍산면","금과면","팔덕면","쌍치면","복흥면","구림면"] }, "고창군": { hasGu: false, dong: ["고창읍","고수면","아산면","무장면","공음면","상하면","해리면","성내면","대산면","심원면","흥덕면","성송면","신림면","부안면"] }, "부안군": { hasGu: false, dong: ["부안읍","주산면","동진면","행안면","계화면","보안면","변산면","진서면","위도면","하서면","줄포면","백산면","상서면"] } } },
+  "전라남도": { type: "do", cities: { "목포시": { hasGu: false, dong: ["대성동","원산동","목원동","동명동","항동","온금동","유달동","북교동","죽교동","율도동","용당1동","용당2동","산정동","연동","연산동","옥암동","부흥동","상동","하당동","신흥동","창평동","삼향읍"] }, "여수시": { hasGu: false, dong: ["중앙동","동산동","관문동","서교동","충무동","광림동","서강동","경호동","신기동","여서동","문수동","둔덕동","쌍봉동","미평동","만흥동","오천동","소라면","율촌면","화양면","남면","돌산읍","삼산면","화정면"] }, "순천시": { hasGu: false, dong: ["향동","중앙동","매곡동","덕연동","저전동","영동","장천동","조례1동","조례2동","생목동","왕지동","풍덕동","도사동","연향동","삼산동","해룡면","서면","월등면","황전면","주암면","송광면","외서면","낙안면","별량면","상사면","승주읍"] }, "나주시": { hasGu: false, dong: ["성북동","영강동","금남동","남내동","중앙동","동수동","송월동","금천면","삼도면","공산면","동강면","다시면","문평면","왕곡면","반남면","세지면","봉황면","남평읍","산포면","다도면"] }, "광양시": { hasGu: false, dong: ["광양읍","봉강면","옥룡면","옥곡면","진상면","진월면","다압면","골약면","중마동","광영동","태인동","금호동","황금동","마동"] }, "담양군": { hasGu: false, dong: ["담양읍","봉산면","고서면","남면","창평면","대덕면","무정면","금성면","용면","월산면","수북면","대전면"] }, "곡성군": { hasGu: false, dong: ["곡성읍","오곡면","삼기면","석곡면","목사동면","죽곡면","고달면","옥과면","입면","겸면","오산면"] }, "구례군": { hasGu: false, dong: ["구례읍","문척면","간전면","토지면","마산면","광의면","용방면","산동면"] }, "고흥군": { hasGu: false, dong: ["고흥읍","도양읍","풍양면","도덕면","금산면","도화면","포두면","봉래면","점암면","과역면","남양면","동강면","대서면","두원면","영남면","동일면","태양면"] }, "보성군": { hasGu: false, dong: ["보성읍","벌교읍","노동면","미력면","겸백면","율어면","복내면","문덕면","조성면","득량면","회천면","웅치면"] }, "화순군": { hasGu: false, dong: ["화순읍","한천면","춘양면","청풍면","이양면","능주면","도곡면","도암면","이서면","북면","동복면","남면","동면"] }, "장흥군": { hasGu: false, dong: ["장흥읍","관산읍","대덕읍","용산면","안양면","장동면","장평면","유치면","부산면","회진면"] }, "강진군": { hasGu: false, dong: ["강진읍","군동면","칠량면","대구면","도암면","이한면","마량면","병영면","성전면","작천면","옴천면"] }, "해남군": { hasGu: false, dong: ["해남읍","삼산면","화산면","현산면","송지면","북평면","북일면","옥천면","계곡면","마산면","황산면","산이면","문내면","화원면"] }, "영암군": { hasGu: false, dong: ["영암읍","삼호읍","덕진면","금정면","신북면","시종면","도포면","군서면","서호면","학산면","미암면","독천면"] }, "무안군": { hasGu: false, dong: ["무안읍","일로읍","삼향읍","몽탄면","청계면","현경면","망운면","해제면","운남면"] }, "함평군": { hasGu: false, dong: ["함평읍","손불면","신광면","학교면","엄다면","대동면","나산면","해보면","월야면"] }, "영광군": { hasGu: false, dong: ["영광읍","백수읍","홍농읍","대마면","묘량면","불갑면","군서면","군남면","염산면","낙월면","법성면","칠곡면"] }, "장성군": { hasGu: false, dong: ["장성읍","진원면","남면","동화면","서삼면","북일면","북이면","북하면","삼계면","황룡면"] }, "완도군": { hasGu: false, dong: ["완도읍","금일읍","노화읍","군외면","신지면","고금면","약산면","청산면","소안면","금당면","생일면"] }, "진도군": { hasGu: false, dong: ["진도읍","군내면","고군면","의신면","임회면","지산면","조도면"] }, "신안군": { hasGu: false, dong: ["지도읍","증도면","임자면","자은면","비금면","도초면","흑산면","하의면","신의면","장산면","안좌면","팔금면","암태면","압해읍"] } } },
+  "경상북도": { type: "do", cities: { "포항시": { hasGu: true, gu: { "남구": ["해도동","송도동","중앙동","상도동","대도동","동해면","구룡포읍","연일읍","오천읍","장기면","호미곶면","대송면"], "북구": ["중앙동","용흥동","우현동","죽도동","창포동","두호동","장량동","양덕동","환여동","흥해읍","신광면","청하면","송라면","기계면","기북면","죽장면"] } }, "경주시": { hasGu: false, dong: ["중부동","성동동","황오동","교동","노서동","노동동","성건동","용강동","동부동","서부동","보덕동","천군동","충효동","강동면","양남면","내남면","산내면","서면","현곡면","안강읍","강서면","외동읍","천북면","감포읍","양북면"] }, "김천시": { hasGu: false, dong: ["자산동","평화남산동","양천동","대신동","대곡동","율곡동","어모면","남면","농소면","금릉면","봉산면","조마면","구성면","지례면","부항면","대덕면","증산면","감문면","개령면"] }, "안동시": { hasGu: false, dong: ["중구동","서구동","북구동","태화동","송현동","용상동","신세동","법상동","강남동","안기동","정상동","화목동","성곡동","풍산읍","와룡면","북후면","서후면","풍천면","일직면","남후면","남선면","임하면","길안면","임동면","예안면","도산면","녹전면","의인면"] }, "구미시": { hasGu: false, dong: ["원평1동","원평2동","송정동","형곡1동","형곡2동","신평1동","신평2동","비산동","공단동","광평동","상모사곡동","임수동","인의동","진평동","도개면","해평면","산동면","도량동","선주원남동","고아읍","무을면","옥성면","장천면","칠곡면","양포동"] }, "영주시": { hasGu: false, dong: ["영주1동","영주2동","가흥1동","가흥2동","휴천1동","휴천2동","휴천3동","상망동","이산면","평은면","문수면","장수면","안정면","봉현면","순흥면","단산면","부석면","소백면","풍기읍"] }, "영천시": { hasGu: false, dong: ["중앙동","문내동","화산동","야사동","대전동","완산동","금호읍","청통면","신녕면","화산면","화북면","화남면","자양면","임고면","고경면","북안면","대창면"] }, "상주시": { hasGu: false, dong: ["동문동","서문동","신봉동","계림동","성동동","남성동","낙양동","북문동","무양동","남장동","인평동","함창읍","이안면","화서면","화남면","화동면","공성면","외서면","내서면","은척면","공검면","모동면","모서면","청리면","사벌국면","낙동면","중동면"] }, "문경시": { hasGu: false, dong: ["점촌1동","점촌2동","점촌3동","점촌4동","가은읍","농암면","영순면","산북면","동로면","호계면","산양면","문경읍","마성면"] }, "경산시": { hasGu: false, dong: ["중방동","백천동","상방동","옥산동","사정동","정평동","압량읍","와촌면","자인면","용성면","남산면","하양읍","진량읍","남천면","고산면"] }, "군위군": { hasGu: false, dong: ["군위읍","소보면","효령면","부계면","우보면","의흥면","산성면","삼국유사면"] }, "의성군": { hasGu: false, dong: ["의성읍","단촌면","점곡면","옥산면","사곡면","춘산면","가음면","금성면","봉양면","비안면","구천면","단밀면","단북면","안계면","다인면","신평면","안평면","안사면"] }, "청송군": { hasGu: false, dong: ["청송읍","부동면","부남면","현동면","현서면","안덕면","파천면","진보면","주왕산면"] }, "영양군": { hasGu: false, dong: ["영양읍","입암면","청기면","일월면","수비면","석보면"] }, "영덕군": { hasGu: false, dong: ["영덕읍","강구면","남정면","달산면","지품면","축산면","영해면","병곡면","창수면"] }, "청도군": { hasGu: false, dong: ["화양읍","청도읍","각남면","풍각면","각북면","이서면","운문면","금천면","매전면"] }, "고령군": { hasGu: false, dong: ["대가야읍","덕곡면","운수면","성산면","다산면","개진면","우곡면","쌍림면"] }, "성주군": { hasGu: false, dong: ["성주읍","선남면","용암면","수륜면","가천면","금수면","대가면","벽진면","초전면","월항면"] }, "칠곡군": { hasGu: false, dong: ["왜관읍","북삼읍","석적읍","지천면","동명면","가산면","약목면","기산면"] }, "예천군": { hasGu: false, dong: ["예천읍","용문면","감천면","보문면","호명면","지보면","풍양면","개포면","청복면","유천면","용궁면","은풍면","상리면","하리면"] }, "봉화군": { hasGu: false, dong: ["봉화읍","물야면","봉성면","법전면","춘양면","소천면","재산면","명호면","상운면","석포면"] }, "울진군": { hasGu: false, dong: ["울진읍","평해읍","금강송면","북면","서면","근남면","온정면","죽변면","후포면","기성면"] }, "울릉군": { hasGu: false, dong: ["울릉읍","서면","북면"] } } },
+  "경상남도": { type: "do", cities: { "창원시": { hasGu: true, gu: { "의창구": ["팔룡동","북면","동읍","대산면","의창동","신월동","도계동","용호동","봉림동","지귀동","소계동","사림동","두대동","서상동"], "성산구": ["성주동","가음정동","사파동","외동","내동","반지동","귀산동","양곡동","명서동","천선동","웅남동","완암동","귀현동","남산동"], "마산합포구": ["중성동","창동","남성동","동성동","서성동","오동동","부림동","월남동","성호동","완월동","상남동","신포동","자산동","반월동","월영동","예곡동","구산면","진전면","진북면","진동면","내서읍"], "마산회원구": ["회원동","석전동","양덕1동","양덕2동","봉암동","내서읍"], "진해구": ["충무동","중앙동","태평동","병암동","석동","이동","자은동","덕산동","경화동","여좌동","장천동","수도동","웅동1동","웅동2동","웅천동","남양동","웅남동"] } }, "진주시": { hasGu: false, dong: ["중앙동","성북동","봉래동","망경동","계동","강남동","가좌동","평거동","이현동","초전동","상봉동","수정동","판문동","문산읍","내동면","정촌면","금곡면","집현면","미천면","지수면","대곡면","금산면","사봉면","수곡면","대평면","명석면","일반성면","이반성면","진성면","단목면","호탄동"] }, "통영시": { hasGu: false, dong: ["항남동","중앙동","태평동","동호동","명정동","문화동","도천동","인평동","북신동","욕지면","한산면","사량면","광도면","용남면","도산면","미수동","봉평동","무전동","정량동"] }, "사천시": { hasGu: false, dong: ["사천읍","정동면","사남면","용현면","축동면","곤양면","곤명면","서포면","동서동","향촌동","남양동","벌리동","이금동","대방동","송포동","선구동"] }, "김해시": { hasGu: false, dong: ["동상동","회현동","부원동","활천동","삼안동","불암동","어방동","내외동","주촌면","진영읍","한림면","생림면","상동면","대동면","장유1동","장유2동","장유3동","율하동","구산동"] }, "밀양시": { hasGu: false, dong: ["내일동","내이동","교동","삼문동","용활동","가곡동","활성동","상동면","하남읍","초동면","무안면","부북면","산외면","산내면","단장면","상남면","청도면","부림면"] }, "거제시": { hasGu: false, dong: ["장승포동","아양동","능포동","아주동","고현동","수월동","상동","중앙동","문동동","양정동","연초면","하청면","거제면","사등면","둔덕면","남부면","동부면","일운면"] }, "양산시": { hasGu: false, dong: ["중부동","강서동","북부동","삼성동","물금읍","동면","원동면","상북면","하북면","웅상읍","평산동","소주동"] }, "의령군": { hasGu: false, dong: ["의령읍","가례면","칠곡면","대의면","화정면","용덕면","정곡면","지정면","낙서면","부림면","봉수면","궁류면","유곡면"] }, "함안군": { hasGu: false, dong: ["가야읍","칠원읍","함안면","군북면","법수면","대산면","칠서면","칠북면","산인면","여항면"] }, "창녕군": { hasGu: false, dong: ["창녕읍","남지읍","고암면","성산면","대합면","이방면","유어면","대지면","계성면","영산면","장마면","도천면","길곡면","부곡면"] }, "고성군": { hasGu: false, dong: ["고성읍","삼산면","하일면","하이면","상리면","대가면","영현면","영오면","개천면","구만면","회화면","마암면","동해면","무이면"] }, "남해군": { hasGu: false, dong: ["남해읍","이동면","상주면","삼동면","미조면","남면","서면","고현면","설천면","창선면"] }, "하동군": { hasGu: false, dong: ["하동읍","화개면","악양면","적량면","횡천면","고전면","금남면","금성면","진교면","양보면","북천면","청암면","옥종면"] }, "산청군": { hasGu: false, dong: ["산청읍","차황면","오부면","생초면","금서면","삼장면","시천면","단성면","신등면","신안면","적중면"] }, "함양군": { hasGu: false, dong: ["함양읍","마천면","휴천면","유림면","수동면","지곡면","안의면","서하면","서상면","백전면","병곡면"] }, "거창군": { hasGu: false, dong: ["거창읍","주상면","웅양면","고제면","북상면","위천면","마리면","남상면","남하면","신원면","가조면","가북면"] }, "합천군": { hasGu: false, dong: ["합천읍","봉산면","묘산면","가야면","야로면","율곡면","초계면","쌍책면","덕곡면","청덕면","적중면","대양면","쌍백면","삼가면","대병면"] } } },
+  "제주특별자치도": { type: "do", cities: { "제주시": { hasGu: false, dong: ["일도1동","일도2동","이도1동","이도2동","삼도1동","삼도2동","용담1동","용담2동","건입동","화북동","삼양동","봉개동","아라동","오라동","연동","노형동","외도동","이호동","도두동","추자면","우도면","조천읍","구좌읍","애월읍","한림읍","한경면","대정읍","안덕면","중문동"] }, "서귀포시": { hasGu: false, dong: ["송산동","정방동","중앙동","천지동","효돈동","영천동","동홍동","서홍동","대륜동","대천동","중문동","예래동","성산읍","표선면","남원읍","대정읍","안덕면","색달동"] } } }
+};
+
+// ================================================================
+// 전역 상태
+// ================================================================
+let selectedRegion = { sido: null, sigun: null, guList: [], dong: [] };
+let keywordPool = [];
+let bulkPool = [];
+let bulkCsvFiles = [];
+let kwCsvFiles = [];
+let kwRows = [], rsaRows = [], singleRows = [];
+let kwGroups = [], rsaGroups = [], singleGroups = [], bulkGroups = [];
+let activeKwGroup = null, activeRsaGroup = null, activeSingleGroup = null;
+let rsaTitleCount = 3, rsaDescCount = 2;
+let combos = [];
+
+// ================================================================
+// 의도 라이브러리
+// ================================================================
+const DEFAULT_LIBRARY = [
+  { id: 'cat1', name: '구매/가격', fav: false, words: ['가격','비용','요금','견적','구매','구입','저렴한','할인','특가','이벤트','프로모션','싼'] },
+  { id: 'cat2', name: '지역', fav: false, words: ['근처','주변','가까운','인근','지역','동네','앞'] },
+  { id: 'cat3', name: '업종 의도', fav: false, words: ['추천','전문','업체','서비스','회사','브랜드','후기','리뷰','비교','순위','1위','유명한'] },
+  { id: 'cat4', name: '시간/긴급', fav: false, words: ['빠른','당일','즉시','빨리','지금','오늘','긴급','급한','바로','즉각'] },
+  { id: 'cat5', name: '방법/정보', fav: false, words: ['방법','어떻게','알아보기','정보','안내','절차','과정','단계','가이드'] },
+  { id: 'cat6', name: '품질/신뢰', fav: false, words: ['믿을수있는','안전한','정품','공인','인증','보증','품질','AS','정식'] },
+  { id: 'cat7', name: 'DIY/자가', fav: false, words: ['직접','셀프','혼자','방법','DIY','자가','스스로'] },
+  { id: 'cat8', name: '프리미엄', fav: false, words: ['최고급','고급','프리미엄','럭셔리','VIP','명품','최상'] }
+];
+let libraryData = [];
+function loadLibrary() { try { const s=localStorage.getItem('bm3_library'); libraryData=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_LIBRARY)); } catch(e) { libraryData=JSON.parse(JSON.stringify(DEFAULT_LIBRARY)); } }
+function saveLibrary() { localStorage.setItem('bm3_library',JSON.stringify(libraryData)); }
+function renderLibrary() { document.getElementById('favCategories').innerHTML=libraryData.filter(c=>c.fav).map(c=>renderCategoryBlock(c,true)).join(''); document.getElementById('libraryCategories').innerHTML=libraryData.filter(c=>!c.fav).map(c=>renderCategoryBlock(c,false)).join(''); }
+function renderCategoryBlock(cat,isFav) { const wrapClass=isFav?'fav-section':'category-block'; const starClass=cat.fav?'star active':'star'; const chips=cat.words.map((w,wi)=>`<div class="intent-chip" onclick="addIntentWord('${escHtml(w)}')">${escHtml(w)}<span class="chip-del" onclick="event.stopPropagation();deleteWord('${cat.id}',${wi})" title="삭제">✕</span></div>`).join(''); return `<div class="${wrapClass}" id="catBlock_${cat.id}"><div class="category-header"><div class="category-title"><span class="${starClass}" onclick="toggleFav('${cat.id}')">★</span>${escHtml(cat.name)}<span style="font-size:11px;color:var(--text-sub);font-weight:400;">(${cat.words.length}개)</span></div><div class="category-header-actions"><button class="btn btn-danger btn-sm" onclick="deleteCategory('${cat.id}')">카테고리 삭제</button></div></div><div class="category-body"><div class="intent-grid">${chips}</div><div class="category-add-row"><input type="text" id="wordInput_${cat.id}" placeholder="단어 입력..." onkeydown="if(event.key==='Enter')addWord('${cat.id}')"><button class="btn btn-primary btn-sm" onclick="addWord('${cat.id}')">＋ 추가</button></div></div></div>`; }
+function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function toggleFav(id) { const c=libraryData.find(x=>x.id===id); if(c){c.fav=!c.fav;saveLibrary();renderLibrary();} }
+function addCategory() { const n=document.getElementById('newCatName').value.trim(); if(!n){showToast('카테고리명을 입력해주세요.','warning');return;} libraryData.push({id:'cat_'+Date.now(),name:n,fav:false,words:[]}); saveLibrary();renderLibrary();document.getElementById('newCatName').value='';showToast(`'${n}' 추가됨!`); }
+function deleteCategory(id) { const c=libraryData.find(x=>x.id===id); if(!c||!confirm(`'${c.name}' 삭제?`))return; libraryData=libraryData.filter(x=>x.id!==id);saveLibrary();renderLibrary();showToast('삭제됨.'); }
+function addWord(id) { const el=document.getElementById(`wordInput_${id}`); const w=el.value.trim(); if(!w){showToast('단어 입력','warning');return;} const c=libraryData.find(x=>x.id===id); if(c){if(c.words.includes(w)){showToast('이미 존재','warning');return;}c.words.push(w);saveLibrary();renderLibrary();showToast(`'${w}' 추가!`);} }
+function deleteWord(id,wi) { const c=libraryData.find(x=>x.id===id); if(c){const w=c.words[wi];c.words.splice(wi,1);saveLibrary();renderLibrary();showToast(`'${w}' 삭제됨.`);} }
+function addIntentWord(word) { const boxes=document.querySelectorAll('.mixer-textarea'); if(!boxes.length){showToast('믹서 박스 없음','warning');return;} const last=boxes[boxes.length-1]; last.value=(last.value?last.value+'\n':'')+word; updateMixerCount(last); showToast(`'${word}' 추가!`); }
+function exportLibrary() { const b=new Blob([JSON.stringify(libraryData,null,2)],{type:'application/json;charset=utf-8;'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u;a.download='bm3_library.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);showToast('내보내기 완료!'); }
+function importLibrary(e) { const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=function(ev){try{const d=JSON.parse(ev.target.result);if(!Array.isArray(d))throw new Error();libraryData=d;saveLibrary();renderLibrary();showToast('가져오기 완료!');}catch{showToast('형식 오류','error');}}; r.readAsText(f); e.target.value=''; }
+function resetLibrary() { if(!confirm('초기화?'))return; libraryData=JSON.parse(JSON.stringify(DEFAULT_LIBRARY));saveLibrary();renderLibrary();showToast('초기화됨.'); }
+
+// ================================================================
+// 테마 / 탭
+// ================================================================
+function toggleTheme() { const d=document.documentElement.getAttribute('data-theme')==='dark'; document.documentElement.setAttribute('data-theme',d?'light':'dark'); document.getElementById('themeBtn').textContent=d?'🌙 다크모드':'☀ 라이트모드'; }
+function switchMainTab(n,el) { document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active')); document.getElementById('tab-'+n).classList.add('active'); el.classList.add('active'); }
+function switchSubTab(n,el) { document.querySelectorAll('.sub-panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active')); document.getElementById('sub-'+n).classList.add('active'); el.classList.add('active'); }
+
+// ================================================================
+// 토스트 / 글자수
+// ================================================================
+function showToast(msg,type='success') { const tc=document.getElementById('toastContainer'); const t=document.createElement('div'); t.className=`toast ${type}`; const icons={success:'✅',error:'❌',warning:'⚠'}; t.innerHTML=`<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`; tc.appendChild(t); setTimeout(()=>{if(t.parentNode)t.remove();},3500); }
+function countChar(el,id,max) { const l=el.value.length; const c=document.getElementById(id); if(!c)return; c.textContent=`${l}/${max}`; c.className='char-counter '+(l>max?'char-over':l>max*0.8?'char-warn':'char-ok'); }
+
+// ================================================================
+// ✅ 지역 선택 — 핵심 수정: 이벤트 위임 방식으로 변경
+// ================================================================
+function renderSido() {
+  const l = document.getElementById('list1');
+  const k = Object.keys(REGION_DATA);
+  l.innerHTML = k.map(x => `<div class="region-item" data-sido="${escHtml(x)}">${escHtml(x)}</div>`).join('');
+  document.getElementById('cnt1').textContent = k.length;
+
+  // ✅ 이벤트 위임: list1 클릭
+  l.onclick = function(e) {
+    const item = e.target.closest('.region-item');
+    if (!item) return;
+    selectSido(item.dataset.sido);
+  };
+}
+
+function filterRegion(s) {
+  const q = document.getElementById(`search${s}`).value.toLowerCase();
+  document.querySelectorAll(`#list${s} .region-item`).forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function selectSido(sido) {
+  selectedRegion = { sido, sigun: null, guList: [], dong: [] };
+  document.querySelectorAll('#list1 .region-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.sido === sido);
+  });
+  resetStep(2); resetStep(3); resetStep(4);
+  document.getElementById('guNotice').style.display = 'none';
+  const data = REGION_DATA[sido];
+
+  if (data.type === 'sejong') {
+    document.getElementById('list2').classList.add('disabled');
+    document.getElementById('list3').classList.add('disabled');
+    document.getElementById('guNotice').style.display = 'block';
+    renderDongList(data.dong);
+    return;
+  }
+  if (data.type === 'metro' || data.type === 'special') {
+    document.getElementById('list2').classList.add('disabled');
+    renderGuList(sido, null);
+    return;
+  }
+  const l2 = document.getElementById('list2');
+  l2.classList.remove('disabled');
+  const cities = Object.keys(data.cities);
+  l2.innerHTML = cities.map(c => `<div class="region-item" data-sigun="${escHtml(c)}">${escHtml(c)}</div>`).join('');
+  document.getElementById('cnt2').textContent = cities.length;
+
+  // ✅ 이벤트 위임: list2 클릭
+  l2.onclick = function(e) {
+    const item = e.target.closest('.region-item');
+    if (!item) return;
+    selectSigun(sido, item.dataset.sigun);
+  };
+}
+
+function selectSigun(sido, sigun) {
+  selectedRegion.sigun = sigun;
+  selectedRegion.guList = [];
+  selectedRegion.dong = [];
+  document.querySelectorAll('#list2 .region-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.sigun === sigun);
+  });
+  resetStep(3); resetStep(4);
+  document.getElementById('guNotice').style.display = 'none';
+  const cd = REGION_DATA[sido].cities[sigun];
+  if (cd.hasGu) {
+    renderGuList(sido, sigun);
+  } else {
+    document.getElementById('list3').classList.add('disabled');
+    document.getElementById('guNotice').style.display = 'block';
+    renderDongList(cd.dong);
+  }
+}
+
+// ✅ 구 목록: data-gu 속성 + 이벤트 위임
+function renderGuList(sido, sigun) {
+  const data = REGION_DATA[sido];
+  const l3 = document.getElementById('list3');
+  l3.classList.remove('disabled');
+  let guObj = (data.type === 'metro' || data.type === 'special')
+    ? data.districts
+    : (sigun ? data.cities[sigun].gu : null);
+  if (!guObj) { l3.classList.add('disabled'); return; }
+
+  const keys = Object.keys(guObj);
+  l3.innerHTML = keys.map(g =>
+    `<div class="region-item" data-gu="${escHtml(g)}">
+      <input type="checkbox" data-gu="${escHtml(g)}" onclick="event.stopPropagation()">
+      ${escHtml(g)}
+    </div>`
+  ).join('');
+  document.getElementById('cnt3').textContent = keys.length;
+
+  // ✅ 이벤트 위임: list3 클릭 (체크박스 직접 클릭 & 행 클릭 모두 처리)
+  l3.onclick = function(e) {
+    // 체크박스 직접 클릭은 별도 처리 (stopPropagation 때문에 여기 도달 안 함)
+    const item = e.target.closest('.region-item');
+    if (!item) return;
+    const guName = item.dataset.gu;
+    if (!guName) return;
+    const cb = item.querySelector('input[type="checkbox"]');
+    // 행 클릭 시 체크박스 상태를 토글
+    cb.checked = !cb.checked;
+    applyGuToggle(item, cb, guName, sido, sigun);
+  };
+
+  // ✅ 체크박스 직접 클릭 처리
+  l3.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', function(e) {
+      const item = this.closest('.region-item');
+      const guName = item.dataset.gu;
+      applyGuToggle(item, this, guName, sido, sigun);
+    });
+  });
+}
+
+// ✅ 구 토글 실제 처리 함수 (상태 읽기 방식으로 변경)
+function applyGuToggle(item, cb, gu, sido, sigun) {
+  const isChecked = cb.checked;
+  item.classList.toggle('selected', isChecked);
+
+  if (isChecked) {
+    if (!selectedRegion.guList.includes(gu)) selectedRegion.guList.push(gu);
+  } else {
+    selectedRegion.guList = selectedRegion.guList.filter(g => g !== gu);
+  }
+  selectedRegion.dong = [];
+  // 읍면동 초기화
+  const l4 = document.getElementById('list4');
+  l4.innerHTML = '';
+  document.getElementById('cnt4').textContent = '0';
+  renderMergedDongList(sido, sigun);
+}
+
+// ✅ 선택된 모든 구의 동 목록을 병합해 렌더
+function renderMergedDongList(sido, sigun) {
+  const data = REGION_DATA[sido];
+  if (!data) return;
+  let allDongs = [];
+  selectedRegion.guList.forEach(gu => {
+    let dongs = [];
+    if (data.type === 'metro' || data.type === 'special') {
+      dongs = data.districts[gu] || [];
+    } else {
+      dongs = sigun ? ((data.cities[sigun].gu || {})[gu] || []) : [];
+    }
+    dongs.forEach(d => { if (!allDongs.includes(d)) allDongs.push(d); });
+  });
+  renderDongList(allDongs);
+}
+
+// ✅ 읍면동 목록 렌더 + 이벤트 위임
+function renderDongList(dongs) {
+  const l4 = document.getElementById('list4');
+  l4.classList.remove('disabled');
+  if (!dongs || dongs.length === 0) {
+    l4.innerHTML = '';
+    document.getElementById('cnt4').textContent = '0';
+    return;
+  }
+  l4.innerHTML = dongs.map(d =>
+    `<div class="region-item" data-dong="${escHtml(d)}">
+      <input type="checkbox" data-dong="${escHtml(d)}" onclick="event.stopPropagation()">
+      ${escHtml(d)}
+    </div>`
+  ).join('');
+  document.getElementById('cnt4').textContent = dongs.length;
+
+  // ✅ 이벤트 위임: list4 행 클릭
+  l4.onclick = function(e) {
+    const item = e.target.closest('.region-item');
+    if (!item) return;
+    const dongName = item.dataset.dong;
+    if (!dongName) return;
+    const cb = item.querySelector('input[type="checkbox"]');
+    cb.checked = !cb.checked;
+    applyDongToggle(item, cb, dongName);
+  };
+
+  // ✅ 체크박스 직접 클릭 처리
+  l4.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      const item = this.closest('.region-item');
+      const dongName = item.dataset.dong;
+      applyDongToggle(item, this, dongName);
+    });
+  });
+}
+
+// ✅ 동 토글 실제 처리 함수
+function applyDongToggle(item, cb, dong) {
+  const isChecked = cb.checked;
+  item.classList.toggle('selected', isChecked);
+  if (isChecked) {
+    if (!selectedRegion.dong.includes(dong)) selectedRegion.dong.push(dong);
+  } else {
+    selectedRegion.dong = selectedRegion.dong.filter(d => d !== dong);
+  }
+}
+
+function resetStep(s) {
+  const list = document.getElementById(`list${s}`);
+  list.innerHTML = '';
+  list.onclick = null; // 이벤트 위임 제거
+  document.getElementById(`cnt${s}`).textContent = '0';
+  document.getElementById(`search${s}`).value = '';
+  if (s >= 2) list.classList.add('disabled');
+  if (s === 3) { document.getElementById('guNotice').style.display = 'none'; selectedRegion.guList = []; }
+  if (s === 4) selectedRegion.dong = [];
+}
+
+// ✅ 전체 선택: 현재 체크 안 된 항목만 선택
+function selectAllRegion(s) {
+  if (s === 3) {
+    const { sido, sigun } = selectedRegion;
+    document.querySelectorAll('#list3 .region-item').forEach(el => {
+      if (el.style.display === 'none') return;
+      const cb = el.querySelector('input[type="checkbox"]');
+      if (!cb || cb.checked) return;
+      cb.checked = true;
+      el.classList.add('selected');
+      const guName = el.dataset.gu;
+      if (guName && !selectedRegion.guList.includes(guName)) {
+        selectedRegion.guList.push(guName);
+      }
+    });
+    selectedRegion.dong = [];
+    if (sido) renderMergedDongList(sido, sigun);
+
+  } else if (s === 4) {
+    document.querySelectorAll('#list4 .region-item').forEach(el => {
+      if (el.style.display === 'none') return;
+      const cb = el.querySelector('input[type="checkbox"]');
+      if (!cb || cb.checked) return;
+      cb.checked = true;
+      el.classList.add('selected');
+      const d = el.dataset.dong;
+      if (d && !selectedRegion.dong.includes(d)) selectedRegion.dong.push(d);
+    });
+
+  } else {
+    // 1단계(시도), 2단계(시군)는 단순 하이라이트만
+    document.querySelectorAll(`#list${s} .region-item`).forEach(el => {
+      if (el.style.display !== 'none') el.classList.add('selected');
+    });
+  }
+}
+
+function clearRegion(s) {
+  document.querySelectorAll(`#list${s} .region-item`).forEach(el => {
+    el.classList.remove('selected');
+    const cb = el.querySelector('input[type="checkbox"]');
+    if (cb) cb.checked = false;
+  });
+  if (s === 3) {
+    selectedRegion.guList = [];
+    selectedRegion.dong = [];
+    const l4 = document.getElementById('list4');
+    l4.innerHTML = '';
+    document.getElementById('cnt4').textContent = '0';
+    selectedRegion.dong = [];
+  }
+  if (s === 4) selectedRegion.dong = [];
+}
+
+// ================================================================
+// 박스 선택 드롭다운 업데이트
+// ================================================================
+function updateRegionTargetBox() {
+  const sel = document.getElementById('regionTargetBox');
+  if (!sel) return;
+  const boxes = document.querySelectorAll('.mixer-textarea');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  boxes.forEach((_, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `박스 ${i + 1}`;
+    sel.appendChild(opt);
+  });
+  if (prev !== '' && prev < boxes.length) sel.value = prev;
+}
+
+// ================================================================
+// 지역 키워드 생성 ✅ 핵심: dong이 없어도 sido/sigun/gu만으로 생성 가능
+// ================================================================
+function generateRegionKeywords() {
+  const inclSido = document.getElementById('inclSido').checked;
+  const inclGun = document.getElementById('inclGun').checked;
+  const inclGu = document.getElementById('inclGu').checked;
+  const inclDong = document.getElementById('inclDong').checked;
+  const removeNum = document.getElementById('regionRemoveNum').checked;
+  const removeSuffix = document.getElementById('regionRemoveSuffix').checked;
+
+  const { sido, sigun, guList, dong } = selectedRegion;
+  const keywords = new Set();
+
+  if (inclSido && sido) keywords.add(sido);
+  if (inclGun && sigun) keywords.add(sigun);
+  if (inclGu && guList.length > 0) {
+    guList.forEach(g => {
+      let name = g;
+      if (removeNum) name = name.replace(/\d+/g, '').trim();
+      if (removeSuffix) name = name.replace(/(구)$/, '').trim();
+      if (name) keywords.add(name);
+    });
+  }
+  if (inclDong && dong.length > 0) {
+    let dongs = [...dong];
+    if (removeNum) dongs = [...new Set(dongs.map(d => d.replace(/\d+(?=동|가|리|읍|면)/g, '').trim()))];
+    if (removeSuffix) dongs = [...new Set(dongs.map(d => d.replace(/(동|가|리|읍|면)$/, '').trim()))];
+    dongs.forEach(d => { if (d) keywords.add(d); });
+  }
+
+  if (!keywords.size) {
+    showToast('지역을 먼저 선택해주세요. (시도/시군/구/동 중 하나 이상 선택 + 해당 포함 옵션 체크)', 'warning');
+    return;
+  }
+
+  const targetIdx = parseInt(document.getElementById('regionTargetBox').value) || 0;
+  const boxes = document.querySelectorAll('.mixer-textarea');
+  const target = boxes[targetIdx] || boxes[0];
+  if (target) {
+    target.value = [...keywords].join('\n');
+    updateMixerCount(target);
+    renderComboBuilder();
+  }
+  showToast(`지역 키워드 ${keywords.size}개 → 박스${targetIdx + 1}에 생성!`);
+}
+
+// ================================================================
+// 믹서 박스
+// ================================================================
+function initMixerBoxes() {
+  const c = document.getElementById('mixerInputs');
+  c.innerHTML = '';
+  for (let i = 0; i < 4; i++) addMixerBox();
+}
+
+function addMixerBox() {
+  const container = document.getElementById('mixerInputs');
+  const idx = container.children.length + 1;
+  const div = document.createElement('div');
+  div.className = 'mixer-box';
+  div.innerHTML = `<div class="mixer-box-header"><span class="mixer-box-label">박스 ${idx}</span><button class="btn btn-secondary btn-sm" onclick="clearBox(this)">지우기</button></div><textarea class="mixer-textarea" placeholder="키워드 입력 (줄바꿈 구분)" oninput="updateMixerCount(this);renderComboBuilder()"></textarea><div class="mixer-count">0개</div>`;
+  container.appendChild(div);
+  updateRegionTargetBox();
+  renderComboBuilder();
+}
+
+function updateMixerCount(el) {
+  const c = el.value.trim() ? el.value.trim().split('\n').filter(l => l.trim()).length : 0;
+  el.parentElement.querySelector('.mixer-count').textContent = c + '개';
+}
+function clearBox(btn) { const b = btn.closest('.mixer-box'); b.querySelector('textarea').value = ''; b.querySelector('.mixer-count').textContent = '0개'; renderComboBuilder(); }
+function removeMixerBox() { const c = document.getElementById('mixerInputs'); if (c.children.length > 1) { c.removeChild(c.lastChild); updateRegionTargetBox(); renderComboBuilder(); } }
+function clearMixerBoxes() { document.querySelectorAll('.mixer-textarea').forEach(t => { t.value = ''; }); document.querySelectorAll('.mixer-count').forEach(c => { c.textContent = '0개'; }); renderComboBuilder(); }
+
+// ================================================================
+// ✅ 조합 빌더 — 수정된 핵심 로직
+// ================================================================
+function getActiveMixerBoxes() {
+  const boxes = document.querySelectorAll('.mixer-textarea');
+  const active = [];
+  boxes.forEach((b, i) => { if (b.value.trim()) active.push(i); });
+  return active;
+}
+
+function renderComboBuilder() {
+  const totalBoxes = document.querySelectorAll('.mixer-textarea').length;
+  // 유효하지 않은 박스 인덱스 제거
+  combos = combos.map(combo => combo.filter(b => b < totalBoxes));
+  // 빈 콤보는 유지 (사용자가 추가한 것)
+
+  const activeBoxes = getActiveMixerBoxes();
+  const comboList = document.getElementById('comboList');
+  if (!comboList) return;
+
+  if (activeBoxes.length === 0) {
+    comboList.innerHTML = '<div style="font-size:12px;color:var(--text-sub);text-align:center;padding:8px;">박스에 키워드를 입력하면 조합을 설정할 수 있습니다.</div>';
+    return;
+  }
+
+  if (combos.length === 0) {
+    comboList.innerHTML = '<div style="font-size:12px;color:var(--text-sub);text-align:center;padding:8px;">＋ 조합 추가 버튼을 눌러 조합을 만드세요.</div>';
+    return;
+  }
+
+  comboList.innerHTML = combos.map((combo, ci) => {
+    const boxBtns = [];
+    combo.forEach((boxIdx, pos) => {
+      if (pos > 0) boxBtns.push(`<span class="combo-plus">+</span>`);
+      boxBtns.push(`<button class="combo-box-btn active" onclick="removeFromCombo(${ci},${pos})" title="클릭하면 제거">박스${boxIdx + 1}</button>`);
+    });
+    // 현재 콤보에 없는 활성 박스만 추가 가능 버튼으로 표시
+    const addableBtns = activeBoxes
+      .filter(bi => !combo.includes(bi))
+      .map(bi => `<button class="combo-box-btn" onclick="addToCombo(${ci},${bi})">＋박스${bi + 1}</button>`)
+      .join('');
+
+    return `<div class="combo-row">
+      <div class="combo-boxes">
+        ${boxBtns.join('')}
+        ${combo.length === 0 ? '<span style="font-size:12px;color:var(--text-sub);">아래 버튼으로 박스를 추가하세요</span>' : ''}
+        ${addableBtns ? `<span style="margin-left:6px;font-size:11px;color:var(--text-sub);">추가:</span>${addableBtns}` : ''}
+      </div>
+      <button class="combo-del" onclick="deleteCombo(${ci})" title="조합 삭제">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+// ✅ 조합 추가: 키워드가 있는 박스가 1개 이상이면 허용
+function addComboRow() {
+  const activeBoxes = getActiveMixerBoxes();
+  if (activeBoxes.length === 0) {
+    showToast('박스에 키워드를 먼저 입력해주세요.', 'warning');
+    return;
+  }
+  combos.push([]);
+  renderComboBuilder();
+}
+
+function addToCombo(ci, boxIdx) {
+  if (!combos[ci].includes(boxIdx)) {
+    combos[ci].push(boxIdx);
+    renderComboBuilder();
+  }
+}
+function removeFromCombo(ci, pos) { combos[ci].splice(pos, 1); renderComboBuilder(); }
+function deleteCombo(ci) { combos.splice(ci, 1); renderComboBuilder(); }
+
+// ================================================================
+// 키워드 믹스
+// ================================================================
+function mixKeywords() {
+  const boxes = document.querySelectorAll('.mixer-textarea');
+  const arrays = [...boxes].map(b => b.value.trim().split('\n').filter(l => l.trim()));
+  const sep = document.getElementById('mixSep').value;
+  const prefix = document.getElementById('mixPrefix').value;
+  const suffix = document.getElementById('mixSuffix').value;
+  const removeNum = document.getElementById('removeNum').checked;
+  const removeDup = document.getElementById('removeDup').checked;
+  const activeBoxes = getActiveMixerBoxes();
+  if (activeBoxes.length === 0) { showToast('키워드를 입력해주세요.', 'warning'); return; }
+  const validCombos = combos.filter(c => c.length >= 2 && c.every(bi => arrays[bi] && arrays[bi].length > 0));
+  let allResults = [];
+  if (validCombos.length === 0) {
+    const nonEmpty = arrays.filter(a => a.length > 0);
+    allResults = nonEmpty.reduce((acc, arr) => acc.flatMap(a => arr.map(b => a ? a + sep + b : b)), ['']);
+  } else {
+    validCombos.forEach(combo => {
+      const comboArrays = combo.map(bi => arrays[bi]);
+      const result = comboArrays.reduce((acc, arr) => acc.flatMap(a => arr.map(b => a ? a + sep + b : b)), ['']);
+      allResults = allResults.concat(result);
+    });
+  }
+  allResults = allResults.map(r => prefix + r + suffix);
+  if (removeNum) allResults = allResults.map(r => r.replace(/\d+/g, '').trim());
+  if (removeDup) allResults = [...new Set(allResults)];
+  allResults = allResults.filter(r => r.trim());
+  document.getElementById('mixResult').textContent = allResults.join('\n');
+  const label = validCombos.length > 0 ? `총 ${allResults.length}개 (${validCombos.length}개 조합)` : `총 ${allResults.length}개`;
+  document.getElementById('mixStats').textContent = label;
+  showToast(`키워드 ${allResults.length}개 생성!`);
+}
+
+function copyResult(id) { const t = document.getElementById(id).textContent; if (!t.trim()) { showToast('복사할 내용 없음', 'warning'); return; } navigator.clipboard.writeText(t).then(() => showToast('복사됨!')); }
+function downloadTxt() { const t = document.getElementById('mixResult').textContent; if (!t.trim()) { showToast('내용 없음', 'warning'); return; } triggerDownload(t, 'keywords.txt', 'text/plain;charset=utf-8;'); }
+
+// ================================================================
+// 일반 풀
+// ================================================================
+function addToPool() {
+  const t = document.getElementById('mixResult').textContent;
+  if (!t.trim()) { showToast('추가할 키워드 없음', 'warning'); return; }
+  const lines = t.trim().split('\n').filter(l => l.trim());
+  let added = 0;
+  lines.forEach(l => { if (!keywordPool.includes(l.trim())) { keywordPool.push(l.trim()); added++; } });
+  renderPool();
+  showToast(`일반 풀에 ${added}개 추가! (중복 ${lines.length - added}개 제외)`);
+}
+
+function renderPool() {
+  const n = keywordPool.length;
+  document.getElementById('poolBadge').textContent = n;
+  document.getElementById('poolCount').textContent = n + '개';
+  document.getElementById('poolStats').textContent = `총 ${n}개`;
+
+  const c = document.getElementById('poolContainer');
+  if (!n) { c.innerHTML = '<div class="no-data" style="width:100%;">풀이 비어있습니다</div>'; }
+  else { c.innerHTML = keywordPool.map((kw, i) => `<div class="pool-chip">${escHtml(kw)}<span class="del" onclick="removeFromPool(${i})">✕</span></div>`).join(''); }
+
+  const kc = document.getElementById('kwPoolContainer');
+  const ks = document.getElementById('kwPoolCount');
+  const kst = document.getElementById('kwPoolStats');
+  if (kc) {
+    ks.textContent = n + '개';
+    kst.textContent = `총 ${n}개`;
+    if (!n) { kc.innerHTML = '<div class="no-data" style="width:100%;padding:12px;">풀이 비어있습니다</div>'; }
+    else { kc.innerHTML = keywordPool.map((kw, i) => `<div class="pool-chip">${escHtml(kw)}<span class="del" onclick="removeFromPool(${i})">✕</span></div>`).join(''); }
+  }
+  updateKwMergeSelect();
+}
+
+function removeFromPool(i) { keywordPool.splice(i, 1); renderPool(); }
+function copyPool() { if (!keywordPool.length) { showToast('풀 비어있음', 'warning'); return; } navigator.clipboard.writeText(keywordPool.join('\n')).then(() => showToast('복사 완료!')); }
+function downloadPool() { if (!keywordPool.length) { showToast('풀 비어있음', 'warning'); return; } triggerDownload(keywordPool.join('\n'), 'keyword_pool.txt', 'text/plain;charset=utf-8;'); }
+function clearPool() { keywordPool = []; renderPool(); showToast('풀 초기화됨.'); }
+
+// ================================================================
+// 대량 풀
+// ================================================================
+function addToBulkPool() { const t = document.getElementById('mixResult').textContent; if (!t.trim()) { showToast('추가할 키워드 없음', 'warning'); return; } const lines = t.trim().split('\n').filter(l => l.trim()); let added = 0; lines.forEach(l => { if (!bulkPool.includes(l.trim())) { bulkPool.push(l.trim()); added++; } }); renderBulkPool(); showToast(`대량 풀에 ${added}개 추가! (중복 ${lines.length - added}개 제외)`); }
+function renderBulkPool() { const c = document.getElementById('bulkPoolContainer'); const n = bulkPool.length; document.getElementById('bulkPoolCount').textContent = n + '개'; document.getElementById('bulkPoolStats').textContent = `총 ${n}개`; document.getElementById('bulkBadge').textContent = n; if (!n) { c.innerHTML = '<div class="no-data" style="width:100%;padding:16px;">대량 풀이 비어있습니다</div>'; return; } c.innerHTML = bulkPool.map((kw, i) => `<div class="bulk-pool-chip">${escHtml(kw)}<span class="del" onclick="removeFromBulkPool(${i})">✕</span></div>`).join(''); }
+function removeFromBulkPool(i) { bulkPool.splice(i, 1); renderBulkPool(); }
+function copyBulkPool() { if (!bulkPool.length) { showToast('대량 풀 비어있음', 'warning'); return; } navigator.clipboard.writeText(bulkPool.join('\n')).then(() => showToast('복사 완료!')); }
+function clearBulkPool() { bulkPool = []; renderBulkPool(); showToast('대량 풀 초기화됨.'); }
+
+// ================================================================
+// 대량 그룹 관리
+// ================================================================
+function addBulkGroup() { const id = document.getElementById('bulkGroupId').value.trim(); const name = document.getElementById('bulkGroupName').value.trim(); if (!id) { showToast('광고그룹ID 입력', 'warning'); return; } bulkGroups.push({ id, name: name || id }); document.getElementById('bulkGroupId').value = ''; document.getElementById('bulkGroupName').value = ''; renderBulkGroups(); }
+function renderBulkGroups() { const c = document.getElementById('bulkGroupList'); if (!bulkGroups.length) { c.innerHTML = '<div class="no-data" style="padding:12px;">등록된 그룹 없음</div>'; return; } c.innerHTML = bulkGroups.map((g, i) => `<div class="group-item"><span class="group-name">${escHtml(g.name)}</span><span class="group-id">${escHtml(g.id)}</span><span class="btn btn-danger btn-sm" onclick="bulkGroups.splice(${i},1);renderBulkGroups()">✕</span></div>`).join(''); }
+
+// ================================================================
+// 대량 CSV 생성
+// ================================================================
+function generateBulkCSV() {
+  if (!bulkPool.length) { showToast('대량 풀이 비어있습니다.', 'warning'); return; }
+  if (!bulkGroups.length) { showToast('광고그룹ID를 먼저 등록해주세요.', 'warning'); return; }
+  const LIMIT = 1000;
+  const totalChunks = Math.ceil(bulkPool.length / LIMIT);
+  if (bulkGroups.length < totalChunks) {
+    const need = totalChunks - bulkGroups.length;
+    showToast(`⚠ 그룹ID가 ${need}개 더 필요합니다! (키워드 ${bulkPool.length}개 → ${totalChunks}개 그룹 필요)`, 'warning');
+    return;
+  }
+  const pcUrl = document.getElementById('bulkPcUrl').value.trim();
+  const moUrl = document.getElementById('bulkMoUrl').value.trim();
+  const bid = document.getElementById('bulkBid').value.trim();
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+  const guides = ['키워드를 추가 할 광고그룹ID 와 신규 키워드를 입력하세요.', "광고그룹ID는 '광고다운로드' 파일에서 확인할 수 있습니다. 입찰가는 쉼표나 '원' 표시를 제외한 숫자만 입력해 주세요.", '입력은 최대 만(10000)개까지 가능합니다. (광고그룹 당 키워드는 1000개까지 등록가능합니다)', '그룹의 웹사이트URL이 1개인 경우라도 PC/모바일 URL에 동일하게 2번 입력해주시고 PC/모바일 웹사이트를 별도로 가지고 있는 경우에만 URL을 PC /모바일 구분해서 입력하세요. URL은 http:// 등으로 시작하는 형식이어야 합니다.', '[중요] 7행부터 입력값이 시스템에 반영됩니다. 1~6행을 삭제하지 마세요. 엑셀에서 저장시 CSV 파일형식을 꼭 확인하시기 바랍니다.'];
+  const newFiles = [];
+  for (let ci = 0; ci < totalChunks; ci++) {
+    const chunk = bulkPool.slice(ci * LIMIT, (ci + 1) * LIMIT);
+    const group = bulkGroups[ci];
+    const rows = [];
+    guides.forEach(g => rows.push(csvRow([g, '', '', '', ''])));
+    rows.push(csvRow(['광고그룹ID(필수)', '키워드(필수)', 'PC URL(선택)', '모바일 URL(선택)', '키워드입찰가(선택,숫자만)']));
+    chunk.forEach(kw => rows.push(csvRow([group.id, kw, pcUrl, moUrl, bid])));
+    const content = rows.join('\r\n');
+    const filename = `naver_bulk_${dateStr}_${ci + 1}.csv`;
+    newFiles.push({ filename, content, groupId: group.id, groupName: group.name, count: chunk.length, createdAt: now.toLocaleTimeString() });
+  }
+  bulkCsvFiles = bulkCsvFiles.concat(newFiles);
+  renderBulkCsvList();
+  showToast(`대량 CSV ${newFiles.length}개 생성 완료! (총 ${bulkPool.length}개 키워드)`);
+}
+
+function renderBulkCsvList() {
+  const c = document.getElementById('bulkCsvList');
+  const n = bulkCsvFiles.length;
+  document.getElementById('bulkCsvCount').textContent = n + '개';
+  document.getElementById('bulkCsvStats').textContent = `총 ${n}개 파일`;
+  if (!n) { c.innerHTML = '<div class="no-data">CSV 파일 없음<br><small>대량 CSV 생성 버튼을 눌러주세요</small></div>'; return; }
+  c.innerHTML = bulkCsvFiles.map((f, i) =>
+    `<div class="csv-file-item">
+      <div class="csv-file-info">
+        <div class="csv-file-name">📄 ${escHtml(f.filename)}</div>
+        <div class="csv-file-meta">그룹ID: ${escHtml(f.groupId)} · 키워드 ${f.count}개 · ${f.createdAt}</div>
+      </div>
+      <div style="display:flex;gap:6px;margin-left:12px;">
+        <button class="btn btn-primary btn-sm" onclick="downloadBulkCsv(${i})">⬇ 다운로드</button>
+        <button class="btn btn-danger btn-sm" onclick="bulkCsvFiles.splice(${i},1);renderBulkCsvList()">✕</button>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function downloadBulkCsv(i) { const f = bulkCsvFiles[i]; if (!f) return; triggerDownload(f.content, f.filename, 'text/csv;charset=utf-8;'); showToast(`${f.filename} 다운로드 완료!`); }
+function clearBulkCsvList() { bulkCsvFiles = []; renderBulkCsvList(); showToast('CSV 목록 초기화됨.'); }
+
+// ================================================================
+// 일반 그룹 CSV 생성
+// ================================================================
+const KW_CSV_LIMIT = 1000;
+
+function buildKwCsvContent(rows) {
+  const guides = [
+    '키워드를 추가 할 광고그룹ID 와 신규 키워드를 입력하세요.',
+    "광고그룹ID는 '광고다운로드' 파일에서 확인할 수 있습니다. 입찰가는 쉼표나 '원' 표시를 제외한 숫자만 입력해 주세요.",
+    '입력은 최대 만(10000)개까지 가능합니다. (광고그룹 당 키워드는 1000개까지 등록가능합니다)',
+    '그룹의 웹사이트URL이 1개인 경우라도 PC/모바일 URL에 동일하게 2번 입력해주시고 PC/모바일 웹사이트를 별도로 가지고 있는 경우에만 URL을 PC /모바일 구분해서 입력하세요. URL은 http:// 등으로 시작하는 형식이어야 합니다.',
+    '[중요] 7행부터 입력값이 시스템에 반영됩니다. 1~6행을 삭제하지 마세요. 엑셀에서 저장시 CSV 파일형식을 꼭 확인하시기 바랍니다.'
+  ];
+  const lines = [];
+  guides.forEach(g => lines.push(csvRow([g, '', '', '', ''])));
+  lines.push(csvRow(['광고그룹ID(필수)', '키워드(필수)', 'PC URL(선택)', '모바일 URL(선택)', '키워드입찰가(선택,숫자만)']));
+  rows.forEach(r => lines.push(csvRow([r.groupId, r.keyword, r.pcUrl, r.moUrl, r.bid])));
+  return lines.join('\r\n');
+}
+
+function generateKwCSV() {
+  if (!kwGroups.length) { showToast('광고그룹ID 등록 필요', 'warning'); return; }
+  if (activeKwGroup === null) { showToast('광고그룹 선택 필요', 'warning'); return; }
+  const g = kwGroups[activeKwGroup];
+  const pcUrl = document.getElementById('kwPcUrl').value.trim();
+  const moUrl = document.getElementById('kwMoUrl').value.trim();
+  const bid = document.getElementById('kwBid').value.trim();
+  const src = document.querySelector('input[name="kwSrc"]:checked').value;
+  let kws = src === 'pool' ? [...keywordPool] : document.getElementById('kwDirect').value.trim().split('\n').filter(l => l.trim());
+  if (!kws.length) { showToast('키워드 없음', 'warning'); return; }
+
+  const isMerge = document.getElementById('kwMergeMode').checked;
+  const mergeIdx = parseInt(document.getElementById('kwMergeTarget').value);
+
+  if (isMerge && !isNaN(mergeIdx) && kwCsvFiles[mergeIdx]) {
+    const target = kwCsvFiles[mergeIdx];
+    const newTotal = target.rows.length + kws.length;
+    if (newTotal > KW_CSV_LIMIT) {
+      const canAdd = KW_CSV_LIMIT - target.rows.length;
+      if (canAdd <= 0) {
+        showToast(`선택한 파일이 이미 ${KW_CSV_LIMIT}개로 꽉 찼습니다. 새 파일로 생성해주세요.`, 'warning');
+        return;
+      }
+      if (!confirm(`추가하면 ${newTotal}개로 1000개를 초과합니다.\n${canAdd}개만 추가하고 나머지 ${kws.length - canAdd}개는 새 파일로 생성할까요?`)) return;
+      const addRows = kws.slice(0, canAdd).map(kw => ({ groupId: g.id, keyword: kw.trim(), pcUrl, moUrl, bid }));
+      target.rows = target.rows.concat(addRows);
+      target.count = target.rows.length;
+      target.content = buildKwCsvContent(target.rows);
+      const remainKws = kws.slice(canAdd);
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+      const newRows = remainKws.map(kw => ({ groupId: g.id, keyword: kw.trim(), pcUrl, moUrl, bid }));
+      kwCsvFiles.push({ filename: `naver_keyword_${dateStr}_${kwCsvFiles.length + 1}.csv`, rows: newRows, count: newRows.length, content: buildKwCsvContent(newRows), groupId: g.id, groupName: g.name, createdAt: now.toLocaleTimeString() });
+      renderKwCsvList();
+      showToast(`${canAdd}개 추가 + 나머지 ${remainKws.length}개 새 파일 생성 완료!`);
+      return;
+    }
+    const addRows = kws.map(kw => ({ groupId: g.id, keyword: kw.trim(), pcUrl, moUrl, bid }));
+    target.rows = target.rows.concat(addRows);
+    target.count = target.rows.length;
+    target.content = buildKwCsvContent(target.rows);
+    renderKwCsvList();
+    showToast(`${kws.length}개 추가 완료! (${target.filename}: 총 ${target.count}개)`);
+    return;
+  }
+
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+  const newRows = kws.map(kw => ({ groupId: g.id, keyword: kw.trim(), pcUrl, moUrl, bid }));
+  if (newRows.length > KW_CSV_LIMIT) {
+    showToast(`⚠ 키워드가 ${KW_CSV_LIMIT}개를 초과합니다. 대량 등록 탭을 이용해주세요.`, 'warning');
+    return;
+  }
+  const filename = `naver_keyword_${dateStr}_${kwCsvFiles.length + 1}.csv`;
+  kwCsvFiles.push({ filename, rows: newRows, count: newRows.length, content: buildKwCsvContent(newRows), groupId: g.id, groupName: g.name, createdAt: now.toLocaleTimeString() });
+  renderKwCsvList();
+  showToast(`CSV 생성 완료! ${filename} (${newRows.length}개)`);
+}
+
+function renderKwCsvList() {
+  const c = document.getElementById('kwCsvList');
+  const n = kwCsvFiles.length;
+  document.getElementById('kwCsvCount').textContent = n + '개';
+  document.getElementById('kwCsvStats').textContent = `총 ${n}개 파일`;
+  if (!n) { c.innerHTML = '<div class="no-data">CSV 파일 없음<br><small>CSV 생성 버튼을 눌러주세요</small></div>'; return; }
+  c.innerHTML = kwCsvFiles.map((f, i) => {
+    const pct = Math.round((f.count / KW_CSV_LIMIT) * 100);
+    const countClass = f.count >= KW_CSV_LIMIT ? 'warn' : 'ok';
+    return `<div class="csv-file-item">
+      <div class="csv-file-info">
+        <div class="csv-file-name">📄 ${escHtml(f.filename)}</div>
+        <div class="csv-file-meta">그룹ID: ${escHtml(f.groupId)} · ${f.createdAt}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+          <div style="flex:1;height:4px;background:var(--border);border-radius:2px;"><div style="width:${pct}%;height:100%;background:var(--primary);border-radius:2px;transition:width 0.3s;"></div></div>
+          <span class="csv-file-count ${countClass}">${f.count}/${KW_CSV_LIMIT}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-left:12px;">
+        <button class="btn btn-primary btn-sm" onclick="downloadKwCsv(${i})">⬇ 다운로드</button>
+        <button class="btn btn-danger btn-sm" onclick="kwCsvFiles.splice(${i},1);renderKwCsvList();updateKwMergeSelect()">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateKwMergeSelect();
+}
+
+function downloadKwCsv(i) { const f = kwCsvFiles[i]; if (!f) return; triggerDownload(f.content, f.filename, 'text/csv;charset=utf-8;'); showToast(`${f.filename} 다운로드!`); }
+function clearKwCsvList() { kwCsvFiles = []; renderKwCsvList(); showToast('CSV 목록 초기화됨.'); }
+
+function updateKwMergeSelect() {
+  const sel = document.getElementById('kwMergeTarget');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— 파일 선택 —</option>';
+  kwCsvFiles.forEach((f, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${f.filename} [${f.count}/${KW_CSV_LIMIT}]`;
+    if (f.count >= KW_CSV_LIMIT) opt.disabled = true;
+    sel.appendChild(opt);
+  });
+}
+
+function toggleKwMergeSelect() {
+  const isMerge = document.getElementById('kwMergeMode').checked;
+  const sel = document.getElementById('kwMergeTarget');
+  sel.style.display = isMerge ? 'block' : 'none';
+  if (isMerge) updateKwMergeSelect();
+}
+
+// ================================================================
+// 광고그룹 관리
+// ================================================================
+function addKwGroup() { const id = document.getElementById('kwGroupId').value.trim(); const name = document.getElementById('kwGroupName').value.trim(); if (!id) { showToast('광고그룹ID 입력', 'warning'); return; } kwGroups.push({ id, name: name || id }); document.getElementById('kwGroupId').value = ''; document.getElementById('kwGroupName').value = ''; renderKwGroups(); }
+function renderKwGroups() { const c = document.getElementById('kwGroupList'); if (!kwGroups.length) { c.innerHTML = '<div class="no-data" style="padding:12px;">등록된 그룹 없음</div>'; return; } c.innerHTML = kwGroups.map((g, i) => `<div class="group-item ${activeKwGroup === i ? 'active' : ''}" onclick="activeKwGroup=${i};renderKwGroups()"><span class="group-name">${escHtml(g.name)}</span><span class="group-id">${escHtml(g.id)}</span><span class="btn btn-danger btn-sm" onclick="event.stopPropagation();kwGroups.splice(${i},1);if(activeKwGroup===${i})activeKwGroup=null;renderKwGroups()">✕</span></div>`).join(''); }
+function addRsaGroup() { const id = document.getElementById('rsaGroupId').value.trim(); const name = document.getElementById('rsaGroupName').value.trim(); if (!id) { showToast('광고그룹ID 입력', 'warning'); return; } rsaGroups.push({ id, name: name || id }); document.getElementById('rsaGroupId').value = ''; document.getElementById('rsaGroupName').value = ''; renderRsaGroups(); }
+function renderRsaGroups() { const c = document.getElementById('rsaGroupList'); if (!rsaGroups.length) { c.innerHTML = '<div class="no-data" style="padding:12px;">등록된 그룹 없음</div>'; return; } c.innerHTML = rsaGroups.map((g, i) => `<div class="group-item ${activeRsaGroup === i ? 'active' : ''}" onclick="activeRsaGroup=${i};renderRsaGroups()"><span class="group-name">${escHtml(g.name)}</span><span class="group-id">${escHtml(g.id)}</span><span class="btn btn-danger btn-sm" onclick="event.stopPropagation();rsaGroups.splice(${i},1);if(activeRsaGroup===${i})activeRsaGroup=null;renderRsaGroups()">✕</span></div>`).join(''); }
+function addSingleGroup() { const id = document.getElementById('singleGroupId').value.trim(); const name = document.getElementById('singleGroupName').value.trim(); if (!id) { showToast('광고그룹ID 입력', 'warning'); return; } singleGroups.push({ id, name: name || id }); document.getElementById('singleGroupId').value = ''; document.getElementById('singleGroupName').value = ''; renderSingleGroups(); }
+function renderSingleGroups() { const c = document.getElementById('singleGroupList'); if (!singleGroups.length) { c.innerHTML = '<div class="no-data" style="padding:12px;">등록된 그룹 없음</div>'; return; } c.innerHTML = singleGroups.map((g, i) => `<div class="group-item ${activeSingleGroup === i ? 'active' : ''}" onclick="activeSingleGroup=${i};renderSingleGroups()"><span class="group-name">${escHtml(g.name)}</span><span class="group-id">${escHtml(g.id)}</span><span class="btn btn-danger btn-sm" onclick="event.stopPropagation();singleGroups.splice(${i},1);if(activeSingleGroup===${i})activeSingleGroup=null;renderSingleGroups()">✕</span></div>`).join(''); }
+
+// ================================================================
+// RSA 필드
+// ================================================================
+function initRsaFields() { const tf = document.getElementById('rsaTitleFields'); const df = document.getElementById('rsaDescFields'); tf.innerHTML = ''; df.innerHTML = ''; rsaTitleCount = 3; rsaDescCount = 2; for (let i = 1; i <= 3; i++) tf.innerHTML += makeTitleField(i, true); for (let i = 1; i <= 2; i++) df.innerHTML += makeDescField(i, true); }
+function makeTitleField(n, req) { return `<div class="form-group"><label class="form-label">제목${n} ${req ? '<span class="req">*</span>' : ''} <small style="color:var(--text-sub)">(최대 15자)</small></label><input type="text" id="rsaTitle${n}" placeholder="${req ? '필수' : '선택'}" maxlength="15" oninput="countChar(this,'rsaT${n}c',15)"><div class="char-counter" id="rsaT${n}c">0/15</div></div>`; }
+function makeDescField(n, req) { return `<div class="form-group"><label class="form-label">설명${n} ${req ? '<span class="req">*</span>' : ''} <small style="color:var(--text-sub)">(최대 45자)</small></label><textarea id="rsaDesc${n}" placeholder="${req ? '필수' : '선택'}" maxlength="45" rows="2" oninput="countChar(this,'rsaD${n}c',45)"></textarea><div class="char-counter" id="rsaD${n}c">0/45</div></div>`; }
+function addRsaTitleField() { if (rsaTitleCount >= 15) { showToast('최대 15개', 'warning'); return; } rsaTitleCount++; document.getElementById('rsaTitleFields').insertAdjacentHTML('beforeend', makeTitleField(rsaTitleCount, false)); }
+function addRsaDescField() { if (rsaDescCount >= 4) { showToast('최대 4개', 'warning'); return; } rsaDescCount++; document.getElementById('rsaDescFields').insertAdjacentHTML('beforeend', makeDescField(rsaDescCount, false)); }
+
+// ================================================================
+// 반응형 / 단일형 소재
+// ================================================================
+function addRsaRow() { if (!rsaGroups.length) { showToast('광고그룹ID 등록 필요', 'warning'); return; } if (activeRsaGroup === null) { showToast('광고그룹 선택 필요', 'warning'); return; } const g = rsaGroups[activeRsaGroup]; const pcUrl = document.getElementById('rsaPcUrl').value.trim(); const moUrl = document.getElementById('rsaMoUrl').value.trim(); if (!pcUrl || !moUrl) { showToast('URL 필수', 'error'); return; } const titles = []; for (let i = 1; i <= rsaTitleCount; i++) { const el = document.getElementById(`rsaTitle${i}`); titles.push(el ? el.value.trim() : ''); } if (!titles[0] || !titles[1] || !titles[2]) { showToast('제목1~3 필수', 'error'); return; } const descs = []; for (let i = 1; i <= rsaDescCount; i++) { const el = document.getElementById(`rsaDesc${i}`); descs.push(el ? el.value.trim() : ''); } if (!descs[0] || !descs[1]) { showToast('설명1~2 필수', 'error'); return; } rsaRows.push({ groupId: g.id, pcUrl, moUrl, titles, descs, fix1: document.getElementById('rsaFix1').value.trim(), fix2: document.getElementById('rsaFix2').value.trim(), fix3: document.getElementById('rsaFix3').value.trim(), fixD1: document.getElementById('rsaFixD1').value.trim(), fixD2: document.getElementById('rsaFixD2').value.trim() }); renderRsaTable(); showToast('반응형 소재 추가됨!'); }
+function renderRsaTable() { const tb = document.getElementById('rsaTbody'); document.getElementById('rsaRowCount').textContent = rsaRows.length + '건'; document.getElementById('rsaStats').textContent = `총 ${rsaRows.length}개`; updateNaverBadge(); if (!rsaRows.length) { tb.innerHTML = '<tr><td colspan="8" class="no-data">추가된 소재 없음</td></tr>'; return; } tb.innerHTML = rsaRows.map((r, i) => `<tr><td>${escHtml(r.groupId)}</td><td>${escHtml(r.pcUrl)}</td><td>${escHtml(r.titles[0] || '')}</td><td>${escHtml(r.titles[1] || '')}</td><td>${escHtml(r.titles[2] || '')}</td><td>${escHtml(r.descs[0] || '')}</td><td>${escHtml(r.descs[1] || '')}</td><td><button class="btn btn-danger btn-del" onclick="rsaRows.splice(${i},1);renderRsaTable()">✕</button></td></tr>`).join(''); }
+function clearRsaRows() { rsaRows = []; renderRsaTable(); }
+function addSingleRow() { if (!singleGroups.length) { showToast('광고그룹ID 등록 필요', 'warning'); return; } if (activeSingleGroup === null) { showToast('광고그룹 선택 필요', 'warning'); return; } const g = singleGroups[activeSingleGroup]; const title = document.getElementById('singleTitle').value.trim(); const desc = document.getElementById('singleDesc').value.trim(); const pcUrl = document.getElementById('singlePcUrl').value.trim(); const moUrl = document.getElementById('singleMoUrl').value.trim(); const medical = document.getElementById('singleMedical').value.trim(); if (!title) { showToast('제목 필수', 'error'); return; } if (!desc) { showToast('설명 필수', 'error'); return; } if (!pcUrl) { showToast('PC URL 필수', 'error'); return; } if (!moUrl) { showToast('모바일 URL 필수', 'error'); return; } if (medical && (medical.length < 6 || medical.length > 12)) { showToast('심의필 번호 6~12자', 'error'); return; } singleRows.push({ groupId: g.id, title, desc, pcUrl, moUrl, medical }); renderSingleTable(); showToast('단일형 소재 추가됨!'); }
+function renderSingleTable() { const tb = document.getElementById('singleTbody'); document.getElementById('singleRowCount').textContent = singleRows.length + '건'; document.getElementById('singleStats').textContent = `총 ${singleRows.length}개`; updateNaverBadge(); if (!singleRows.length) { tb.innerHTML = '<tr><td colspan="7" class="no-data">추가된 소재 없음</td></tr>'; return; } tb.innerHTML = singleRows.map((r, i) => `<tr><td>${escHtml(r.groupId)}</td><td>${escHtml(r.title)}</td><td>${escHtml(r.desc)}</td><td>${escHtml(r.pcUrl)}</td><td>${escHtml(r.moUrl)}</td><td>${escHtml(r.medical) || '-'}</td><td><button class="btn btn-danger btn-del" onclick="singleRows.splice(${i},1);renderSingleTable()">✕</button></td></tr>`).join(''); }
+function clearSingleRows() { singleRows = []; renderSingleTable(); }
+function updateNaverBadge() { document.getElementById('naverBadge').textContent = kwCsvFiles.reduce((s, f) => s + f.count, 0) + rsaRows.length + singleRows.length; }
+
+// ================================================================
+// CSV 유틸
+// ================================================================
+function csvCell(v) { const s = (v === null || v === undefined) ? '' : String(v); return (s.includes(',') || s.includes('"') || s.includes('\n') || s.includes('\r')) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+function csvRow(a) { return a.map(csvCell).join(','); }
+function triggerDownload(content, filename, mime) { const blob = new Blob(['\uFEFF' + content], { type: mime || 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); }
+function downloadRsaCSV() { if (!rsaRows.length) { showToast('소재 없음', 'warning'); return; } const E = Array(26).fill(''); const guides = ["광고그룹ID는 '광고다운로드' 파일에서 확인할 수 있으며, 입력은 최대 만(10000)개까지 가능합니다.", '광고그룹 1개당 등록 가능한 소재는 총 5개 까지 입니다.', '소재의 연결 URL이 1개인 경우라도 PC/모바일 URL에 동일하게 2번 입력해주시고, PC/모바일 연결 URL을 별도로 가지고 있는 경우에만 URL을 PC /모바일 구분해서 입력하세요.', "의료 광고 대상 광고주께서는 심의필번호를 등록하기 전에 '의료광고 심의필증'을 서류관리 메뉴를 통해 제출해야 검토가 진행됩니다.", '[중요] 7행부터 입력값이 시스템에 반영됩니다. 1~6행을 삭제하지 마세요. 엑셀에서 저장시 CSV 파일형식을 꼭 확인하시기 바랍니다.']; const header = ['광고그룹ID(필수)', 'PC URL(필수)', '모바일 URL(필수)', '제목1 (필수)', '제목2 (필수)', '제목3 (필수)', '제목4 (선택)', '제목5 (선택)', '제목6 (선택)', '제목7 (선택)', '제목8 (선택)', '제목9 (선택)', '제목10 (선택)', '제목11 (선택)', '제목12 (선택)', '제목13 (선택)', '제목14 (선택)', '제목15 (선택)', '설명1 (필수)', '설명2 (필수)', '설명3 (선택)', '설명4 (선택)', '첫 번째 제목 위치 고정(선택)', '두 번째 제목 위치 고정(선택)', '세 번째 제목 위치 고정(선택)', '첫 번째 설명 위치에 고정(선택)', '두 번째 설명 위치에 고정(선택)']; const rows = []; guides.forEach(g => rows.push(csvRow([g, ...E]))); rows.push(csvRow(header)); rsaRows.forEach(r => { const t = Array(15).fill(''); r.titles.forEach((x, i) => { t[i] = x || ''; }); const d = Array(4).fill(''); r.descs.forEach((x, i) => { d[i] = x || ''; }); rows.push(csvRow([r.groupId, r.pcUrl, r.moUrl, ...t, ...d, r.fix1, r.fix2, r.fix3, r.fixD1, r.fixD2])); }); triggerDownload(rows.join('\r\n'), 'naver_rsa_ad.csv'); showToast(`반응형 CSV 완료! (${rsaRows.length}건)`); }
+function downloadSingleCSV() { if (!singleRows.length) { showToast('소재 없음', 'warning'); return; } const E = Array(5).fill(''); const guides = ["광고그룹ID는 '광고다운로드' 파일에서 확인할 수 있으며, 입력은 최대 만(10000)개까지 가능합니다.", '광고그룹 1개당 등록 가능한 소재는 총 5개 까지 입니다.', '소재의 연결 URL이 1개인 경우라도 PC/모바일 URL에 동일하게 2번 입력해주시고, PC/모바일 연결 URL을 별도로 가지고 있는 경우에만 URL을 PC /모바일 구분해서 입력하세요. URL은 http:// 등으로 시작하는 형식이어야 합니다.', "의료 광고 대상 광고주께서는 심의필번호를 등록하기 전에 '의료광고 심의필증'을 서류관리 메뉴를 통해 제출해야 검토가 진행됩니다.", '[중요] 7행부터 입력값이 시스템에 반영됩니다. 1~6행을 삭제하지 마세요. 엑셀에서 저장시 CSV 파일형식을 꼭 확인하시기 바랍니다.']; const header = ['광고그룹ID(필수)', '제목(필수)', '설명(필수)', 'PC URL(필수)', '모바일 URL(필수)', '의료광고 심의필 번호(의료광고인 경우에만 입력하세요. 6~12자)']; const rows = []; guides.forEach(g => rows.push(csvRow([g, ...E]))); rows.push(csvRow(header)); singleRows.forEach(r => rows.push(csvRow([r.groupId, r.title, r.desc, r.pcUrl, r.moUrl, r.medical]))); triggerDownload(rows.join('\r\n'), 'naver_single_ad.csv'); showToast(`단일형 CSV 완료! (${singleRows.length}건)`); }
+
+// ================================================================
+// 전체 초기화
+// ================================================================
+function clearAll() {
+  if (!confirm('모든 데이터를 초기화?')) return;
+  keywordPool = []; bulkPool = []; bulkCsvFiles = []; kwCsvFiles = [];
+  kwRows = []; rsaRows = []; singleRows = [];
+  kwGroups = []; rsaGroups = []; singleGroups = []; bulkGroups = [];
+  activeKwGroup = null; activeRsaGroup = null; activeSingleGroup = null;
+  selectedRegion = { sido: null, sigun: null, guList: [], dong: [] };
+  combos = [];
+  renderPool(); renderBulkPool(); renderBulkCsvList(); renderKwCsvList();
+  renderRsaTable(); renderSingleTable();
+  renderKwGroups(); renderRsaGroups(); renderSingleGroups(); renderBulkGroups();
+  clearMixerBoxes();
+  document.getElementById('mixResult').textContent = '';
+  document.getElementById('mixStats').textContent = '';
+  for (let i = 1; i <= 4; i++) resetStep(i);
+  renderSido();
+  showToast('전체 초기화 완료.');
+}
+
+// ================================================================
+// DOMContentLoaded
+// ================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  renderSido();
+  initMixerBoxes();
+  loadLibrary();
+  renderLibrary();
+  renderPool();
+  renderBulkPool();
+  renderBulkCsvList();
+  renderKwCsvList();
+  renderKwGroups();
+  renderRsaGroups();
+  renderSingleGroups();
+  renderBulkGroups();
+  initRsaFields();
+  renderComboBuilder();
+  document.querySelectorAll('input[name="kwSrc"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const isDirect = document.querySelector('input[name="kwSrc"]:checked').value === 'direct';
+      document.getElementById('kwDirect').style.display = isDirect ? 'block' : 'none';
+    });
+  });
+});
+</script>
+</body>
+</html>
